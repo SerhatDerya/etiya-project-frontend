@@ -1,1 +1,32 @@
-/* You can add global styles to this file, and also import other style files */
+@use "tailwindcss";
+
+:root {
+  --color-primary-dark: #242441;
+  --color-primary-orange: #f58220;
+}
+
+/* -------------------------------------------------------------------
+   1. Frutiger LT Regular Tanımlaması (OTF)
+   ------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Frutiger LT';
+  src: url('assets/fonts/frutiger/FrutigerLTStd-Light.otf') format('opentype');
+  font-weight: 400; /* Regular kalınlık */
+  font-style: normal;
+  font-display: swap; /* Font yüklenirken metnin görünmesini sağlar */
+}
+
+/* -------------------------------------------------------------------
+   2. Frutiger LT Bold Tanımlaması (OTF)
+   ------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Frutiger LT';
+  src: url('assets/fonts/frutiger/FrutigerLTStd-Bold.otf') format('opentype');
+  font-weight: 700; /* Bold kalınlık */
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: 'Frutiger LT', Arial, sans-serif;
+}
