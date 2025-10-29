@@ -1,0 +1,38 @@
+<!-- ...existing code... -->
+<div class="login-container">
+  <div class="login-panel">
+    <img class="logo" src="/assets/images/etiya-logo-large.svg" alt="ETIYA" />
+
+    <h3 class="welcome">WELCOME TO ETIYA!</h3>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+      <label class="field-label">Username*:</label>
+      <input type="text" formControlName="username" class="input-field" placeholder="Username" />
+
+      <label class="field-label">Password*:</label>
+      <div class="password-wrapper">
+        <input [type]="showPassword ? 'text' : 'password'" formControlName="password" class="input-field" placeholder="Password" />
+        <button type="button" class="eye-btn" (click)="togglePassword()" aria-label="toggle password">
+          <!-- open eye -->
+          <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#242441" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+
+          <!-- closed eye: içteki yuvarlağı kaldırıldı ve ortadan soldan sağa yatay çizgi eklendi -->
+          <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#242441" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+
+      <button type="submit" class="btn-login" [disabled]="loginForm.invalid">LOGIN</button>
+    </form>
+
+    <p class="signin-note">Sign in with your organization account!</p>
+  </div>
+
+  <div class="login-art" role="presentation"></div>
+</div>
+<!-- ...existing code... -->

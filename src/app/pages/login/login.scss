@@ -1,0 +1,113 @@
+// ...existing code...
+.login-container {
+  display: flex;
+  min-height: 100vh;
+  font-family: Inter, system-ui, Arial, sans-serif;
+}
+
+.login-panel {
+  width: 420px;
+  background: #242441;
+  color: #fff;
+  padding: 48px 36px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.logo {
+  width: 140px;
+  margin-bottom: 8px;
+}
+
+.welcome {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin: 6px 0 18px;
+}
+
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field-label {
+  color: #f5a050;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+  background: #fff;
+  color: #242441;
+  font-size: 14px;
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.eye-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #242441;
+}
+
+.btn-login {
+  margin-top: 10px;
+  background: #f58220;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 140px;
+  text-align: center;
+}
+
+.btn-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.signin-note {
+  color: rgba(255,255,255,0.7);
+  font-size: 12px;
+  margin-top: 18px;
+}
+
+/* Right art panel */
+.login-art {
+  flex: 1;
+  background-image: url('/assets/images/login-bg.webp');
+  background-size: cover;
+  background-position:right;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .login-container { flex-direction: column; }
+  .login-panel { width: 100%; padding: 28px; }
+  .login-art { height: 240px; }
+}
+// ...existing code...

@@ -1,36 +1,66 @@
 <div class="flex-grow h-full bg-transparent border-2 border-[#242441] rounded-lg overflow-hidden flex flex-col">
     
-    <div class="bg-[#242441] p-3">
-        <h2 class="text-white text-lg font-semibold">Search Results</h2>
+  <!-- Üst Başlık -->
+  <div class="bg-[#242441] p-3">
+    <h2 class="text-white text-lg font-semibold">Search Results</h2>
+  </div>
+
+  <div class="p-0 flex flex-col h-full">
+
+    <!-- Başlık Satırı -->
+    <div class="grid grid-cols-6 gap-x-1 p-2 bg-[#f58220] text-xs font-bold uppercase text-[#242441] sticky top-0">
+      <div class="truncate">Customer ID</div>
+      <div class="truncate">First Name</div>
+      <div class="truncate">Second Name</div>
+      <div class="truncate">Last Name</div>
+      <div class="truncate">Role</div>
+      <div class="truncate">Nat ID</div>
     </div>
 
-    <div class="p-0">
-        
-        <div class="grid grid-cols-6 gap-x-1 p-2 bg-[#f58220] text-xs font-bold uppercase text-[#242441] sticky top-0">
-            <div class="truncate">Customer ID</div>
-            <div class="truncate">First Name</div>
-            <div class="truncate">Second Name</div>
-            <div class="truncate">Last Name</div>
-            <div class="truncate">Role</div>
-            <div class="truncate">Nat ID</div>
-        </div>
+    <!-- İçerik -->
+    <div class="divide-y divide-gray-200 flex-grow overflow-y-auto">
 
-        <div class="divide-y divide-gray-200">
-            
-            @if (customersResponse()) {
-                @for (customer of customersResponse(); track customer.natId) {
-                    <app-search-result-item 
-                    [firstName]="customer.firstName" 
-                    [middleName]="customer.middleName" 
-                    [lastName]="customer.lastName" 
-                    [natId]="customer.natId"
-                    ></app-search-result-item>
-                }
-            }
-            
-
-            
-            
+      @if (customersResponse(); as response) {
+        @if (response.length > 0) {
+          @for (customer of paginatedCustomers(); track customer.natId) {
+            <app-search-result-item 
+              [firstName]="customer.firstName"
+              [middleName]="customer.middleName"
+              [lastName]="customer.lastName"
+              [natId]="customer.natId"
+            ></app-search-result-item>
+          }
+        } @else {
+          <div class="text-center text-gray-400 p-4">
+            No customers found.
+          </div>
+        }
+      } @else {
+        <div class="text-center text-gray-400 p-4">
+          Loading...
         </div>
+      }
+
     </div>
+
+    <!-- Sayfalama Kontrolleri -->
+    <div class="flex items-center justify-center gap-2 p-3 bg-[#242441] text-white text-sm">
+      <button 
+        class="px-3 py-1 bg-[#f58220] rounded disabled:opacity-50" 
+        (click)="previousPage()" 
+        [disabled]="isFirstPage()">
+        ‹ Prev
+      </button>
+
+      <span>Page {{ currentPage() }} / {{ totalPages() }}</span>
+
+      <button 
+        class="px-3 py-1 bg-[#f58220] rounded disabled:opacity-50" 
+        (click)="nextPage()" 
+        [disabled]="isLastPage()">
+        Next ›
+      </button>
+    </div>
+
+  </div>
 </div>
