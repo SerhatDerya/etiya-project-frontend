@@ -1,4 +1,195 @@
 <div class="py-5 px-5 flex space-x-5 h-full">
-    <app-search-filter></app-search-filter>
-    <app-search-results class="flex-grow"></app-search-results> 
+    <!-- Search Filter -->
+    <div>
+      
+        <div 
+            class="flex flex-col h-full shadow-2xl p-6" 
+            style="width: 280px; background-color: #242441;"
+        >
+            
+            <h2 class="text-xl font-semibold mb-6 pb-2 border-b" style="color: white; border-color: rgba(255, 255, 255, 0.2);">
+                Search Filter
+            </h2>
+
+            <form [formGroup]="searchForm" (ngSubmit)="onSubmit()" class="flex flex-col space-y-4 flex-grow">
+                
+                <div>
+                    <label for="nat_id" class="text-xs font-medium block mb-1" style="color: #f58220;">NAT ID Number</label>
+                    <input 
+                        type="text" 
+                        id="nat_id" 
+                        formControlName="nationalId"
+                        class="w-full p-2 text-sm rounded border border-[#f58220] focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white 
+                                disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60"  style="border-color: #f58220; color: #242441;"
+                        placeholder="Enter ID"
+                    >
+                </div>
+
+                <div>
+                    <label for="customer_id" class="text-xs font-medium block mb-1" style="color: #f58220;">Customer ID</label>
+                    <input 
+                        type="text" 
+                        id="customer_id" 
+                        formControlName="customerId"
+                        class="w-full p-2 text-sm rounded border border-[#f58220] focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white 
+                                disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60"  style="border-color: #f58220; color: #242441;"
+                        placeholder="Enter Customer ID"
+                    >
+                </div>
+
+                <div>
+                    <label for="account_number" class="text-xs font-medium block mb-1" style="color: #f58220;">Account Number</label>
+                    <input 
+                        type="text" 
+                        id="account_number"
+                        formControlName="accountNumber"
+                        class="w-full p-2 text-sm rounded border border-[#f58220] focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white 
+                                disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60"  style="border-color: #f58220; color: #242441;"
+                        placeholder="Enter Account Number"
+                    >
+                </div>
+
+                <div>
+                    <label for="gsm_number" class="text-xs font-medium block mb-1" style="color: #f58220;">GSM Number</label>
+                    <input 
+                        type="text" 
+                        id="gsm_number" 
+                        formControlName="gsmNumber"
+                        class="w-full p-2 text-sm rounded border border-[#f58220] focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white 
+                                disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60"  style="border-color: #f58220; color: #242441;"
+                        placeholder="Enter GSM"
+                    >
+                </div>
+
+                <div>
+                    <label for="first_name" class="text-xs font-medium block mb-1" style="color: #f58220;">First Name</label>
+                    <input 
+                        type="text" 
+                        id="first_name" 
+                        formControlName="firstName"
+                        class="w-full p-2 text-sm rounded border border-[#f58220] focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white"  style="border-color: #f58220; color: #242441;"
+                        placeholder="Enter First Name"
+                    >
+                </div>
+
+                <div>
+                    <label for="last_name" class="text-xs font-medium block mb-1" style="color: #f58220;">Last Name</label>
+                    <input 
+                        type="text" 
+                        id="last_name" 
+                        formControlName="lastName"
+                        class="w-full p-2 text-sm rounded border border-[#f58220] focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white"  style="border-color: #f58220; color: #242441;"
+                        placeholder="Enter Last Name"
+                    >
+                </div>
+
+                <div>
+                    <label for="order_number" class="text-xs font-medium block mb-1" style="color: #f58220;">Order Number</label>
+                    <input 
+                        type="text" 
+                        id="order_number" 
+                        formControlName="orderNumber"
+                        class="w-full p-2 text-sm rounded border border-[#f58220] focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white 
+                                disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60"  style="border-color: #f58220; color: #242441;"
+                        placeholder="Enter Order Number"
+                    >
+                </div>
+
+            </form>
+
+            <div class="flex justify-between mt-6 pt-4 border-t" style="border-color: rgba(255, 255, 255, 0.2);">
+                <button 
+                    type="button"
+                    (click)="onClear()"
+                    [disabled]="!isDirty()"
+                    class="px-4 py-2 rounded font-semibold transition duration-150 ease-in-out cursor-pointer 
+                            disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400" 
+                    style="background-color: #f58220; color: white;"
+                >
+                    Clear
+                </button>
+                <button 
+                    type="submit"
+                    (click)="onSubmit()"
+                    [disabled]="!isDirty()"
+                    class="px-4 py-2 rounded font-semibold transition duration-150 ease-in-out cursor-pointer
+                            disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400" 
+                    style="background-color: #f58220; color: white;"
+                >
+                    Search
+                </button>
+            </div>
+
+        </div>
+        
+    </div>
+
+    <!-- Search Results -->
+    <div class="flex-grow h-full bg-transparent border-2 border-[#242441] rounded-lg overflow-hidden flex flex-col">
+    
+        <!-- Üst Başlık -->
+        <div class="bg-[#242441] p-3">
+            <h2 class="text-white text-lg font-semibold">Search Results</h2>
+        </div>
+
+        <div class="p-0 flex flex-col h-full">
+
+            <!-- Başlık Satırı -->
+            <div class="grid grid-cols-6 gap-x-1 p-2 bg-[#f58220] text-xs font-bold uppercase text-[#242441] sticky top-0">
+            <div class="truncate">Customer ID</div>
+            <div class="truncate">First Name</div>
+            <div class="truncate">Second Name</div>
+            <div class="truncate">Last Name</div>
+            <div class="truncate">Role</div>
+            <div class="truncate">Nat ID</div>
+            </div>
+
+            <!-- İçerik -->
+            <div class="divide-y divide-gray-200 flex-grow overflow-y-auto">
+
+            @if (customersResponse(); as response) {
+                @if (response.length > 0) {
+                @for (customer of paginatedCustomers(); track customer.natId) {
+                    <app-search-result-item 
+                    [firstName]="customer.firstName"
+                    [middleName]="customer.middleName"
+                    [lastName]="customer.lastName"
+                    [natId]="customer.natId"
+                    ></app-search-result-item>
+                }
+                } @else {
+                <div class="text-center text-gray-400 p-4">
+                    No customers found.
+                </div>
+                }
+            } @else {
+                <div class="text-center text-gray-400 p-4">
+                Loading...
+                </div>
+            }
+
+            </div>
+
+            <!-- Sayfalama Kontrolleri -->
+            <div class="flex items-center justify-center gap-2 p-3 bg-[#242441] text-white text-sm">
+            <button 
+                class="px-3 py-1 bg-[#f58220] rounded disabled:opacity-50" 
+                (click)="previousPage()" 
+                [disabled]="isFirstPage()">
+                ‹ Prev
+            </button>
+
+            <span>Page {{ currentPage() }} / {{ totalPages() }}</span>
+
+            <button 
+                class="px-3 py-1 bg-[#f58220] rounded disabled:opacity-50" 
+                (click)="nextPage()" 
+                [disabled]="isLastPage()">
+                Next ›
+            </button>
+            </div>
+
+        </div>
+        </div>
+
 </div>
