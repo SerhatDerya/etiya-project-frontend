@@ -16,21 +16,25 @@ export class Login {
   showPassword = false;
 
   constructor(
-    private auth: AuthService,
+    private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
     private formBuilder: FormBuilder
   ) {}
 
   ngOnInit() {
-    this.loginForm = this.formBuilder.group({
-      username: new FormControl('', [Validators.required, Validators.minLength(2)]),
-      password: new FormControl('', [Validators.required, Validators.minLength(2)])
-    });
+    this.buildForm();
 
-    if (this.auth.isLoggedIn()) {
+    if (this.authService.userState().isLoggedIn) {
       this.router.navigateByUrl('/b2c');
     }
+  }
+
+  buildForm() {
+    this.loginForm = this.formBuilder.group({
+      username: ['', [Validators.required, Validators.minLength(2)]],
+      password: ['', [Validators.required, Validators.minLength(2)]]
+    });
   }
 
   togglePassword() {
@@ -38,14 +42,17 @@ export class Login {
   }
 
   onLogin() {
-    if (this.loginForm.invalid) return;
-
-    const { username, password } = this.loginForm.value;
-    if (this.auth.login(username?.toString().trim(), password?.toString().trim())) {
-      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/b2c';
-      this.router.navigateByUrl(returnUrl);
-    } else {
-      alert('Wrong username or password. Please try again');
+    if (this.loginForm.valid) {
+      const { username, password } = this.loginForm.value;
+      
+      this.authService.login(username?.toString().trim(), password?.toString().trim()).subscribe({
+        next: () => {
+          this.router.navigateByUrl("/");
+        },
+        error: (err) => {
+          alert('Login failed. Check credentials and try again.');
+        }
+      });
     }
   }
 }

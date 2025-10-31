@@ -10,10 +10,10 @@ import { AuthService } from '../../services/auth-service';
 export class Sidebar {
 
   constructor(
-    private auth: AuthService
+    private authService: AuthService
   ) {}
 
   logOut() {
-    this.auth.logout();
+    this.authService.logout();
   }
 }
