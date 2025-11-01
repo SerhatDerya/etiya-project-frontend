@@ -10,8 +10,13 @@ export class CustomerService {
   getCustomers(params: URLSearchParams) {
     const baseUrl = 'http://localhost:8091/searchservice/api/customer-search/search';
     const queryUrl = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+    const token = localStorage.getItem('token');
     console.log('Fetching customers with URL:', queryUrl);
-    return this.httpClient.get<CustomerListResponse[]>(queryUrl);
+    return this.httpClient.get<CustomerListResponse[]>(queryUrl, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
   }
-  
+ 
 }
