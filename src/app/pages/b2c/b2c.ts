@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { Navbar } from "../../components/navbar/navbar";
-import { Search } from "../../components/search/search";
 import { Sidebar } from "../../components/sidebar/sidebar";
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-b2c',
-  imports: [Navbar, Search, Sidebar],
+  imports: [Navbar, Sidebar, RouterOutlet],
   templateUrl: './b2c.html',
   styleUrl: './b2c.scss',
 })

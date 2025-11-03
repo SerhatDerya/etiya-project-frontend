@@ -18,7 +18,7 @@
                     <input 
                         type="text" 
                         id="nat_id" 
-                        formControlName="nationalId"
+                        formControlName="natId"
                         class="w-full p-2 text-sm rounded border border-[#f58220] focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white 
                                 disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60"  style="border-color: #f58220; color: #242441;"
                         placeholder="Enter ID"
@@ -163,9 +163,15 @@
                 </div>
                 }
             } @else {
-                <div class="text-center text-gray-400 p-4">
-                Loading...
+                <div class="text-center text-gray-500 p-6">
+                No customers found. Would you like to create a new customer?
                 </div>
+                <div class="flex justify-center">
+                    <button type="button" (click)="onCreateCustomer()" class="px-3 py-1 rounded font-semibold text-white cursor-pointer" style="background-color: #f58220;">
+                        Create Customer
+                    </button>
+                </div>
+                
             }
 
             </div>

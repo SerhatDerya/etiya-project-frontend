@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CustomerListResponse } from '../../models/customerListResponse';
 import { CustomerService } from '../../services/customer-service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -19,8 +20,8 @@ export class Search {
   primaryFields = ['nationalId', 'customerId', 'accountNumber', 'gsmNumber', 'orderNumber'];
 
   customersResponse = signal<CustomerListResponse[] | undefined>(undefined);
-  
-  constructor(private customerService: CustomerService, private fb : FormBuilder) {}
+
+  constructor(private customerService: CustomerService, private fb : FormBuilder, private router : Router) {}
 
   // Sayfalama için signal'lar
   currentPage = signal(1);
@@ -42,7 +43,7 @@ export class Search {
 
   ngOnInit(): void {
     this.searchForm = this.fb.group({
-      nationalId: [''],
+      natId: [''],
       customerId: [''],
       accountNumber: [''],
       gsmNumber: [''],
@@ -114,6 +115,10 @@ export class Search {
     if (this.currentPage() > 1) {
       this.currentPage.update(p => p - 1);
     }
+  }
+
+  onCreateCustomer(): void {
+    this.router.navigateByUrl('/b2c/create-customer');
   }
   
   // İlk ve son sayfa kontrolü

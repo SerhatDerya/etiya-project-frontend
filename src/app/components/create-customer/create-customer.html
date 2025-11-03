@@ -1,0 +1,164 @@
+<div class="min-h-screen bg-gray-100 p-8">
+  <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-8">
+    
+    <nav class="flex justify-between items-center border-b pb-4 mb-8">
+      <h2 class="text-2xl font-bold text-gray-800">Create Customer</h2>
+      <div class="flex space-x-4">
+        
+        <span class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+              [class]="currentStep === 1 ? 'bg-[#242441] text-white' : 'bg-gray-200 text-gray-600 hover:bg-blue-100'">
+          1. Demographic Info
+        </span>
+        
+        <span class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+              [class]="currentStep === 2 ? 'bg-[#242441] text-white' : 'bg-gray-200 text-gray-600 hover:bg-blue-100'">
+          2. Address Info
+        </span>
+        
+        <span class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+              [class]="currentStep === 3 ? 'bg-[#242441] text-white' : 'bg-gray-200 text-gray-600 hover:bg-blue-100'">
+          3. Contact Medium
+        </span>
+      </div>
+    </nav>
+
+    <form [formGroup]="customerForm" (ngSubmit)="createCustomer()">
+      
+      @if (currentStep === 1) {
+        <div class="space-y-6">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <div>
+              <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+              <input id="firstName" type="text" formControlName="firstName" 
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+              @if (customerForm.get('firstName')?.invalid && customerForm.get('firstName')?.touched) {
+                <p class="mt-1 text-xs text-red-600">First Name zorunludur.</p>
+              }
+            </div>
+            
+            <div>
+              <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+              <input id="lastName" type="text" formControlName="lastName" 
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div>
+              <label for="gender" class="block text-sm font-medium text-gray-700">Gender</label>
+              <select id="gender" formControlName="gender" 
+                      class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                <option value="" disabled>Seçiniz</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="motherName" class="block text-sm font-medium text-gray-700">Mother Name</label>
+              <input id="motherName" type="text" formControlName="motherName"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div>
+              <label for="middleName" class="block text-sm font-medium text-gray-700">Middle Name (Optional)</label>
+              <input id="middleName" type="text" formControlName="middleName"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div>
+              <label for="birthDate" class="block text-sm font-medium text-gray-700">Birth Date</label>
+              <input id="birthDate" type="date" formControlName="birthDate" 
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div>
+              <label for="fatherName" class="block text-sm font-medium text-gray-700">Father Name</label>
+              <input id="fatherName" type="text" formControlName="fatherName"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div>
+              <label for="nationalityId" class="block text-sm font-medium text-gray-700">Nationality ID</label>
+              <input id="nationalityId" type="text" formControlName="nationalityId" 
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+          </div>
+          
+          <div class="pt-5 border-t mt-8 flex justify-end space-x-3">
+            <button type="button" (click)="onCancel()" class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Cancel
+            </button>
+            <button type="button" (click)="nextStep()"
+                    [disabled]="customerForm.get('firstName')?.invalid || customerForm.get('lastName')?.invalid || customerForm.get('gender')?.invalid || customerForm.get('birthDate')?.invalid || customerForm.get('nationalityId')?.invalid"
+                    class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#f58220] hover:bg-[#e76b1f] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#f58220] disabled:opacity-50 disabled:cursor-not-allowed">
+              Next
+            </button>
+          </div>
+        </div>
+      }
+      
+      @if (currentStep === 2) {
+        <div class="space-y-6">
+          
+          <div formGroupName="address" class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p class="text-sm text-yellow-800">Şu anlık bu kısım için ek bir input istenmedi. Sadece gezinme butonları mevcut.</p>
+          </div>
+          
+          <div class="pt-5 border-t mt-8 flex justify-between">
+            <button type="button" (click)="prevStep()"
+                    class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Previous
+            </button>
+            <button type="button" (click)="nextStep()"
+                    class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#f58220] hover:bg-[#e76b1f] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#f58220]">
+              Next
+            </button>
+          </div>
+        </div>
+      }
+      
+      @if (currentStep === 3) {
+        <div class="space-y-6">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-700">E-mail</label>
+              <input id="email" type="email" formControlName="email" 
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            
+            <div>
+              <label for="mobilePhone" class="block text-sm font-medium text-gray-700">Mobile Phone</label>
+              <input id="mobilePhone" type="tel" formControlName="mobilePhone" 
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div>
+              <label for="homePhone" class="block text-sm font-medium text-gray-700">Home Phone (Optional)</label>
+              <input id="homePhone" type="tel" formControlName="homePhone"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            
+            <div>
+              <label for="fax" class="block text-sm font-medium text-gray-700">Fax (Optional)</label>
+              <input id="fax" type="tel" formControlName="fax"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+          </div>
+          
+          <div class="pt-5 border-t mt-8 flex justify-between">
+            <button type="button" (click)="prevStep()"
+                    class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Previous
+            </button>
+            <button type="submit"
+                    [disabled]="customerForm.get('email')?.invalid || customerForm.get('mobilePhone')?.invalid || !customerForm.valid"
+                    class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
+              Create Customer
+            </button>
+          </div>
+        </div>
+      }
