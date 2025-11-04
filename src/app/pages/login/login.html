@@ -29,10 +29,14 @@
         </button>
       </div>
 
+      @if (loginError() != null) {
+        <p name="login-error" class="bg-red-700 text-white px-4 py-2 rounded-lg mt-2 font-semibold text-center">{{loginError()}}</p>
+      }
+
       <button type="submit" class="btn-login" [disabled]="loginForm.invalid">LOGIN</button>
     </form>
 
-    <p class="signin-note">Sign in with your organization account!</p>
+    
   </div>
 
   <div class="login-art" role="presentation"></div>

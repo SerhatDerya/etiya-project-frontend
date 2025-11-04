@@ -1,6 +1,6 @@
 import { Component, computed, signal } from '@angular/core';
 import { SearchResultItem } from "../search-result-item/search-result-item";
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CustomerListResponse } from '../../models/customerListResponse';
 import { CustomerService } from '../../services/customer-service';
@@ -17,7 +17,7 @@ export class Search {
 
   searchForm !: FormGroup;
   
-  primaryFields = ['nationalId', 'customerId', 'accountNumber', 'gsmNumber', 'orderNumber'];
+  primaryFields = ['natId', 'customerId', 'accountNumber', 'gsmNumber', 'orderNumber'];
 
   customersResponse = signal<CustomerListResponse[] | undefined>(undefined);
 
@@ -43,7 +43,7 @@ export class Search {
 
   ngOnInit(): void {
     this.searchForm = this.fb.group({
-      natId: [''],
+      natId: ['', Validators.pattern('^\\d{11}$')],
       customerId: [''],
       accountNumber: [''],
       gsmNumber: [''],
@@ -54,6 +54,7 @@ export class Search {
 
     this.setupPrimaryFieldsControl();
     this.isDirty();
+    this.currentPage.set(0);
   }
 
   setupPrimaryFieldsControl(): void {
@@ -80,8 +81,18 @@ export class Search {
   }
 
   onSubmit(): void {
-    console.log(this.searchForm.value);
-    this.fetchCustomers();
+    if(this.searchForm.valid){
+      console.log(this.searchForm.value);
+      this.fetchCustomers();
+      this.currentPage.set(1);
+    }else{
+      Object.keys(this.searchForm.controls).forEach(field => {
+        if (this.searchForm.get(field)?.invalid) {
+          alert(`${field} field is invalid!`);
+        }
+      });
+      //alert('Form geçersiz');
+    }
   }
 
   onClear(): void {
@@ -89,6 +100,8 @@ export class Search {
     this.primaryFields.forEach(fieldName => {
       this.searchForm.get(fieldName)?.enable({ emitEvent: false });
     });
+    //this.customersResponse.set(undefined);
+    //this.currentPage.set(0);
   }
 
   isDirty(): boolean {
@@ -122,7 +135,12 @@ export class Search {
   }
   
   // İlk ve son sayfa kontrolü
-  isFirstPage = computed(() => this.currentPage() === 1);
+  isFirstPage = computed(() => {
+    if (this.totalPages() === 0) {
+      return true;
+    }
+    return this.currentPage() === 1;
+  });
   isLastPage = computed(() => this.currentPage() === this.totalPages());
 
   fetchCustomers() {

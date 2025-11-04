@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { AuthService } from '../../services/auth-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 export class Login {
 
   loginForm!: FormGroup;
+  loginError = signal<string | null>(null);
   showPassword = false;
 
   constructor(
@@ -50,7 +51,8 @@ export class Login {
           this.router.navigateByUrl("/");
         },
         error: (err) => {
-          alert('Login failed. Check credentials and try again.');
+          this.loginError.set('Wrong username or password. Please try again!');
+          console.log("Login error:", this.loginError());
         }
       });
     }

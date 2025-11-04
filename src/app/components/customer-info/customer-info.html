@@ -1,0 +1,186 @@
+<div class="min-h-screen bg-gray-100 p-8">
+  <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-8">
+    
+    <nav class="flex justify-between items-center border-b pb-4 mb-8">
+      <h2 class="text-2xl font-bold text-gray-800">Customer Info</h2>
+      <div class="flex space-x-4">
+        
+        <span class="px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition-colors"
+              (click)="selectStep(1)"
+              [class]="currentStep === 1 ? 'bg-[#242441] text-white' : 'bg-gray-200 text-gray-600 hover:bg-blue-100'">
+          1. Customer Info
+        </span>
+        
+        <span class="px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition-colors"
+              (click)="selectStep(2)"
+              [class]="currentStep === 2 ? 'bg-[#242441] text-white' : 'bg-gray-200 text-gray-600 hover:bg-blue-100'">
+          2. Customer Account
+        </span>
+        
+        <span class="px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition-colors"
+              (click)="selectStep(3)"
+              [class]="currentStep === 3 ? 'bg-[#242441] text-white' : 'bg-gray-200 text-gray-600 hover:bg-blue-100'">
+          3. Address Info
+        </span>
+        
+        <span class="px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition-colors"
+              (click)="selectStep(4)"
+              [class]="currentStep === 4 ? 'bg-[#242441] text-white' : 'bg-gray-200 text-gray-600 hover:bg-blue-100'">
+          4. Contact Medium
+        </span>
+      </div>
+    </nav>
+
+    <form [formGroup]="customerForm">
+      
+      @if (currentStep === 1) {
+        <div class="space-y-6">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <div *ngFor="let controlName of customerInfoControls">
+              <label [for]="controlName" class="block text-sm font-medium text-gray-700">
+                {{ getLabel(controlName) }}
+              </label>
+              
+              <ng-container *ngIf="isEditingStep(1); else viewModeStep1">
+                <ng-container *ngIf="controlName !== 'gender'; else genderSelectEdit1">
+                  <input [id]="controlName" [type]="getInputType(controlName)" [formControlName]="controlName" 
+                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+                </ng-container>
+                <ng-template #genderSelectEdit1>
+                  <select [id]="controlName" [formControlName]="controlName" 
+                          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                    <option value="" disabled>Seçiniz</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </ng-template>
+                
+                @if (customerForm.get(controlName)?.invalid && customerForm.get(controlName)?.touched) {
+                  <p class="mt-1 text-xs text-red-600">{{ getLabel(controlName) }} zorunludur.</p>
+                }
+
+              </ng-container>
+              <ng-template #viewModeStep1>
+                <p class="mt-1 block w-full bg-gray-50 border border-gray-300 rounded-md p-3 text-gray-800">
+                  {{ customerForm.get(controlName)?.value || '-' }}
+                </p>
+              </ng-template>
+            </div>
+          </div>
+          
+          <div class="pt-5 border-t mt-8 flex" [class.justify-between]="isEditingStep(1)" [class.justify-start]="!isEditingStep(1)">
+            
+            @if (!isEditingStep(1)) {
+              <button type="button" (click)="enableEdit(1)" 
+                      class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Edit
+              </button>
+            }
+            
+            @if (isEditingStep(1)) {
+              <div>
+                <button type="button" (click)="cancelEdit(1)" class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  Cancel
+                </button>
+                <button type="button" (click)="saveChanges(1)"
+                        [disabled]="!isStepValid(1)"
+                        class="ml-3 px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                  Save
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (currentStep === 2) {
+        <div class="space-y-6">
+          <div formGroupName="account" class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-sm text-blue-800">
+              Bu kısım (2. Customer Account) şu an için boş bırakılmıştır. Düzenleme butonu istenmemiştir.
+            </p>
+          </div>
+        </div>
+      }
+      
+      @if (currentStep === 3) {
+        <div class="space-y-6">
+          <div formGroupName="address" class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p class="text-sm text-yellow-800">
+              Bu adımda (3. Address Info) sadece verilerin görüntülenmesi amaçlanmıştır. Düzenleme butonu istenmemiştir.
+            </p>
+            
+            <div class="mt-4 grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Country</label>
+                <p class="mt-1 block w-full bg-gray-50 border border-gray-300 rounded-md p-3 text-gray-800">
+                  {{ customerForm.get('address.country')?.value || 'N/A' }}
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">City</label>
+                <p class="mt-1 block w-full bg-gray-50 border border-gray-300 rounded-md p-3 text-gray-800">
+                  {{ customerForm.get('address.city')?.value || 'N/A' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+      
+      @if (currentStep === 4) {
+        <div class="space-y-6">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div *ngFor="let controlName of contactMediumControls">
+              <label [for]="controlName" class="block text-sm font-medium text-gray-700">
+                {{ getLabel(controlName) }}
+              </label>
+              
+              <ng-container *ngIf="isEditingStep(4); else viewModeContact">
+                <input [id]="controlName" [type]="getInputType(controlName)" [formControlName]="controlName" 
+                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+              </ng-container>
+              <ng-template #viewModeContact>
+                <p class="mt-1 block w-full bg-gray-50 border border-gray-300 rounded-md p-3 text-gray-800">
+                  {{ customerForm.get(controlName)?.value || '-' }}
+                </p>
+              </ng-template>
+
+              @if (customerForm.get(controlName)?.invalid && customerForm.get(controlName)?.touched) {
+                <p class="mt-1 text-xs text-red-600">{{ getLabel(controlName) }} zorunludur veya geçersizdir.</p>
+              }
+            </div>
+          </div>
+          
+          <div class="pt-5 border-t mt-8 flex" [class.justify-between]="isEditingStep(4)" [class.justify-start]="!isEditingStep(4)">
+            
+            @if (!isEditingStep(4)) {
+              <button type="button" (click)="enableEdit(4)" 
+                      class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Edit
+              </button>
+            }
+            
+            @if (isEditingStep(4)) {
+              <div>
+                <button type="button" (click)="cancelEdit(4)" class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  Cancel
+                </button>
+                <button type="button" (click)="saveChanges(4)"
+                        [disabled]="!isStepValid(4)"
+                        class="ml-3 px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                  Save
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </form>
+  </div>
+</div>

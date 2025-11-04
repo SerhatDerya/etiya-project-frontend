@@ -4,6 +4,7 @@ import { Login } from './pages/login/login';
 import { authGuard } from './guards/auth-guard';
 import { CreateCustomer } from './components/create-customer/create-customer';
 import { Search } from './components/search/search';
+import { CustomerInfo } from './components/customer-info/customer-info';
 
 export const routes: Routes = [
     {path: 'login', component: Login},
@@ -13,7 +14,9 @@ export const routes: Routes = [
         canActivate: [authGuard],
         children: [
             {path: '', component: Search},
-            {path: 'create-customer', component: CreateCustomer}
+            {path: 'create-customer', component: CreateCustomer},
+            {path: 'customer-info', component: CustomerInfo},
+            {path: 'customer-info/:id', component: CustomerInfo},
         ]
     },
     {path: '', redirectTo: 'b2c', pathMatch: 'full'},
