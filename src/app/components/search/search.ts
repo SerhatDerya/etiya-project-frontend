@@ -26,6 +26,8 @@ export class Search {
   // Sayfalama için signal'lar
   currentPage = signal(1);
   pageSize = signal(20); // Her sayfada 20 müşteri
+
+  isLoading = signal(false);
   
   // Toplam sayfa sayısı (computed)
   totalPages = computed(() => {
@@ -144,6 +146,8 @@ export class Search {
   isLastPage = computed(() => this.currentPage() === this.totalPages());
 
   fetchCustomers() {
+
+    this.isLoading.set(true);
     
     const values = this.searchForm?.value ?? {};
     const params = new URLSearchParams();
@@ -162,9 +166,11 @@ export class Search {
     this.customerService.getCustomers(params).subscribe({
       next: (response) => {
         this.customersResponse.set(response);
+        this.isLoading.set(false);
       },
       error: (error) => {
         console.error('Error fetching customers:', error);
+        this.isLoading.set(false);
       }
     })
   }

@@ -15,6 +15,7 @@ export class Login {
   loginForm!: FormGroup;
   loginError = signal<string | null>(null);
   showPassword = false;
+  isLoading = signal(false);
 
   constructor(
     private authService: AuthService,
@@ -45,12 +46,15 @@ export class Login {
   onLogin() {
     if (this.loginForm.valid) {
       const { username, password } = this.loginForm.value;
-      
+      this.isLoading.set(true);
+      this.loginError.set(null);
       this.authService.login(username?.toString().trim(), password?.toString().trim()).subscribe({
         next: () => {
           this.router.navigateByUrl("/");
+          this.isLoading.set(false);
         },
         error: (err) => {
+          this.isLoading.set(false);
           this.loginError.set('Wrong username or password. Please try again!');
           console.log("Login error:", this.loginError());
         }

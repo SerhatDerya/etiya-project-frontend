@@ -33,7 +33,15 @@
         <p name="login-error" class="bg-red-700 text-white px-4 py-2 rounded-lg mt-2 font-semibold text-center">{{loginError()}}</p>
       }
 
-      <button type="submit" class="btn-login" [disabled]="loginForm.invalid">LOGIN</button>
+      @if (isLoading()) {
+              
+        <div class="spinner-overlay"><span class="spinner"></span> Logging in...</div> 
+       
+      }
+      @else {
+        <button type="submit" class="btn-login" [disabled]="loginForm.invalid">LOGIN</button>
+      }
+
     </form>
 
     

@@ -147,30 +147,37 @@
 
             <!-- İçerik -->
             <div class="divide-y divide-gray-200 flex-1 overflow-auto">
-                @if (customersResponse(); as response) {
-                @if (response.length > 0) {
-                @for (customer of paginatedCustomers(); track customer.natId) {
-                    <app-search-result-item 
-                    [firstName]="customer.firstName"
-                    [middleName]="customer.middleName"
-                    [lastName]="customer.lastName"
-                    [natId]="customer.natId"
-                    ></app-search-result-item>
-                }
+                @if (isLoading()) {
+                    <div class="flex flex-col items-center justify-center h-full">
+                        <div class="spinner mb-4"></div>
+                        <div class="text-gray-500">Loading customers...</div>
+                    </div>
                 } @else {
-                <div class="text-center text-gray-400 p-4">
-                    No customers found.
-                </div>
-                }
-                } @else {
-                <div class="text-center text-gray-500 p-6">
-                No customers found. Would you like to create a new customer?
-                </div>
-                <div class="flex justify-center">
-                    <button type="button" (click)="onCreateCustomer()" class="px-3 py-1 rounded font-semibold text-white cursor-pointer" style="background-color: #f58220;">
-                        Create Customer
-                    </button>
-                </div>
+                    @if (customersResponse(); as response) {
+                        @if (response.length > 0) {
+                            @for (customer of paginatedCustomers(); track customer.natId) {
+                                <app-search-result-item 
+                                [firstName]="customer.firstName"
+                                [middleName]="customer.middleName"
+                                [lastName]="customer.lastName"
+                                [natId]="customer.natId"
+                                ></app-search-result-item>
+                            }
+                        } @else {
+                            <div class="text-center text-gray-400 p-4">
+                                No customers found.
+                            </div>
+                        }
+                    } @else {
+                    <div class="text-center text-gray-500 p-6">
+                    No customers found. Would you like to create a new customer?
+                    </div>
+                    <div class="flex justify-center">
+                        <button type="button" (click)="onCreateCustomer()" class="px-3 py-1 rounded font-semibold text-white cursor-pointer" style="background-color: #f58220;">
+                            Create Customer
+                        </button>
+                    </div>
+                    }
                 }
             </div>
 
