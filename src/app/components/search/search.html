@@ -157,6 +157,7 @@
                         @if (response.length > 0) {
                             @for (customer of paginatedCustomers(); track customer.natId) {
                                 <app-search-result-item 
+                                [customerId]="customer.customerNumber"
                                 [firstName]="customer.firstName"
                                 [middleName]="customer.middleName"
                                 [lastName]="customer.lastName"

@@ -35,9 +35,12 @@ export class CreateCustomer implements OnInit {
 
       // 2. Address Info Group
       address: this.fb.group({
-        country: [''],
-        city: [''],
-        // ... diğer adres alanları
+        title: ['', Validators.required],
+        city: ['', Validators.required],
+        street: ['', Validators.required],
+        houseNumber: ['', Validators.required],
+        description: ['', Validators.required],
+        isDefault: [false],
       }),
 
       // 3. Contact Medium Group

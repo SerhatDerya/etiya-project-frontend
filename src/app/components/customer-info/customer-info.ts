@@ -2,32 +2,39 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CustomerService } from '../../services/customer-service'; 
-import { CustomerListResponse } from '../../models/customerListResponse'; 
-import { Router } from '@angular/router'; // Yönlendirme için eklendi
+import { CustomerListResponse, AddressSearch, ContactMedium } from '../../models/customerListResponse'; // AddressSearch tipini ekledik
+import { ActivatedRoute, Router } from '@angular/router'; 
+import { HttpClient } from '@angular/common/http'; // HttpClientModule eklenmeli, eğer CustomerService içinde kullanılıyorsa
 
 @Component({
   selector: 'app-customer-info',
   standalone: true, 
   imports: [
     ReactiveFormsModule, 
-    CommonModule, // *ngFor, *ngIf ve ng-template için gerekli
+    CommonModule, 
+    // HttpClientModule // Eğer main.ts'de veya app.config.ts'de sağlanmadıysa buraya eklenmeli
   ],
   templateUrl: './customer-info.html',
   styleUrls: ['./customer-info.scss']
 })
 export class CustomerInfo implements OnInit {
-  currentStep: number = 1; // 1: Customer Info, 2: Customer Account, 3: Address Info, 4: Contact Medium
+
+  currentStep: number = 1; 
   customerForm!: FormGroup;
   
   editingSteps: { [key: number]: boolean } = { 1: false, 2: false, 3: false, 4: false }; 
   formBackup: any = {};
   
-  // URL'den veya başka bir yerden alınması gereken müşteri ID'si simülasyonu
+  // Adres Yönetimi İçin Yeni Değişkenler
+  addressList: AddressSearch[] = [];
+  currentAddressPage: number = 1;
+  addressesPerPage: number = 2; // Her sayfada en fazla 2 adres
+  
   private customerId: string = '987654'; 
 
   customerInfoControls = ['firstName', 'lastName', 'gender', 'motherName', 'middleName', 'birthDate', 'fatherName', 'nationalityId'];
   customerAccountControls: string[] = []; 
-  addressInfoControls: string[] = []; 
+  addressInfoControls: string[] = []; // Artık bu kullanılmayacak, adresler listelenecek
   contactMediumControls = ['email', 'mobilePhone', 'homePhone', 'fax'];
   
   private labels: { [key: string]: string } = {
@@ -45,19 +52,19 @@ export class CustomerInfo implements OnInit {
     fax: 'Fax (Optional)'
   };
 
-  constructor(private fb: FormBuilder, private customerService: CustomerService, private router: Router) {}
+  constructor(private fb: FormBuilder, private customerService: CustomerService, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadCustomerData();
     
     // Formu başlangıçta salt okunur yapmak için tüm kontrolleri devre dışı bırak
-    this.disableFormControls(1);
+    this.disableFormControls(); // 0 tüm düzenlenebilir alanları temsil etsin
   }
   
   initializeForm(): void {
     this.customerForm = this.fb.group({
-      // 1. Customer Info Group (Demografik/API'dan gelen veriler)
+      // 1. Customer Info Group 
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       gender: ['', Validators.required],
@@ -69,16 +76,16 @@ export class CustomerInfo implements OnInit {
 
       // 2. Customer Account Group (Boş)
       account: this.fb.group({
-         // Şimdilik boş
+          // Şimdilik boş
       }),
 
-      // 3. Address Info Group (Boş/Simülasyon)
+      // 3. Address Info Group (Adres verisi ayrı bir state'te tutulacak)
       address: this.fb.group({
-        country: [''],
-        city: [''],
+        // Adres bilgileri API'dan geldiği için form'da tutulmayacak
+        // Sadece diğer adımlarla tutarlılık için address formGroup'u bırakılabilir
       }),
 
-      // 4. Contact Medium Group (Simülasyon/Manuel)
+      // 4. Contact Medium Group 
       email: ['', [Validators.required, Validators.email]],
       mobilePhone: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       homePhone: [''],
@@ -88,8 +95,8 @@ export class CustomerInfo implements OnInit {
 
   loadCustomerData(): void {
     const params = new URLSearchParams();
-    params.append('natId', "22345678988"); 
-    
+    params.append('natId', localStorage.getItem('selectedCustomerNatId') || ''); 
+
     this.customerService.getCustomers(params).subscribe({
       next: (response) => {
         if (response && response.length > 0) {
@@ -101,30 +108,40 @@ export class CustomerInfo implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Müşteri verisi çekilirken hata oluştu:', error);
-        this.patchDefaultValues();
+        console.error('Müşteri verisi yüklenirken hata oluştu:', error);
+        this.patchDefaultValues(); // Hata durumunda varsayılan değerleri yükle
       }
     });
+     
   }
 
   // API'dan gelen veriyi form kontrollerine eşler
   private patchCustomerInfo(data: CustomerListResponse): void {
+    // 1. Müşteri Bilgileri
     this.customerForm.patchValue({
       firstName: data.firstName,
       middleName: data.middleName,
       lastName: data.lastName,
-      birthDate: data.dateOfBirth, // API alanı: dateOfBirth
-      gender: data.gender,
+      birthDate: data.dateOfBirth, 
+      gender: data.gender === 'K' ? 'female' : (data.gender === 'E' ? 'male' : 'other'), // API'dan gelen 'K'/'E' yi form değerine çevir
       motherName: data.motherName,
       fatherName: data.fatherName,
-      nationalityId: data.natId, // API alanı: natId
-      
-      // API'dan gelmeyen diğer alanlar için varsayılan değerler
-      email: 'customer@loaded.com', 
-      mobilePhone: '5559998877', 
-      address: { country: 'Türkiye', city: 'Ankara' }
+      nationalityId: data.natId, 
     });
+
+    // 2. İletişim Bilgileri (Contact Mediums dizisinden ilk elemanı al)
+    // Değişiklik burada: ContactMedium tipini belirtmek (veya Partial<ContactMedium>)
+    const contact: Partial<ContactMedium> = data.contactMediums && data.contactMediums.length > 0 ? data.contactMediums[0] : {}; 
     
+    this.customerForm.patchValue({
+      email: contact.email || 'customer@loaded.com', 
+      mobilePhone: contact.mobilePhone || '5559998877', 
+      homePhone: contact.homePhone || '',
+      fax: contact.fax || ''
+    });
+
+    // 3. Adres Bilgileri
+    this.addressList = data.addressSearches || [];
     this.formBackup = this.customerForm.value;
   }
   
@@ -138,12 +155,53 @@ export class CustomerInfo implements OnInit {
       nationalityId: '00000000000',
       email: 'default@test.com',
       mobilePhone: '5551234567',
-      address: { country: 'World', city: 'Virtual' }
     });
+    this.addressList = [
+      { id: '1', title: 'Default Ev', street: 'Default Sk', houseNumber: '1', description: 'Varsayılan adres', cityName: 'Virtual', cityId: '0' },
+      { id: '2', title: 'Default İş', street: 'Default Cad', houseNumber: '2', description: 'Varsayılan iş adresi', cityName: 'Virtual', cityId: '0' }
+    ] as AddressSearch[]; // Simülasyon Adres Listesi
     this.formBackup = this.customerForm.value;
   }
 
-  // --- Navigasyon ve Düzenleme Metotları ---
+  // --- Adres Yönetim Metotları ---
+
+  getDisplayedAddresses(): AddressSearch[] {
+    const startIndex = (this.currentAddressPage - 1) * this.addressesPerPage;
+    const endIndex = startIndex + this.addressesPerPage;
+    return this.addressList.slice(startIndex, endIndex) as AddressSearch[];
+  }
+
+  nextAddressPage(): void {
+    const totalPages = Math.ceil(this.addressList.length / this.addressesPerPage);
+    if (this.currentAddressPage < totalPages) {
+      this.currentAddressPage++;
+    } else {
+      // Başa dönmek istenirse: this.currentAddressPage = 1;
+      // İstenmezse: console.log('Son sayfadasınız');
+    }
+  }
+
+  prevAddressPage(): void {
+    if (this.currentAddressPage > 1) {
+      this.currentAddressPage--;
+    }
+  }
+
+  get totalAddressPages(): number {
+    return Math.ceil(this.addressList.length / this.addressesPerPage);
+  }
+
+  // Adres sayfasında sağ ok gösterilmeli mi?
+  shouldShowNextArrow(): boolean {
+    return this.addressList.length > this.addressesPerPage && this.currentAddressPage < this.totalAddressPages;
+  }
+
+  // Adres sayfasında sol ok gösterilmeli mi?
+  shouldShowPrevArrow(): boolean {
+    return this.addressList.length > this.addressesPerPage && this.currentAddressPage > 1;
+  }
+  
+  // --- Navigasyon ve Düzenleme Metotları (Değişmedi) ---
 
   selectStep(step: number): void {
     if (this.currentStep !== step) {
@@ -152,13 +210,17 @@ export class CustomerInfo implements OnInit {
         return; 
       }
       this.currentStep = step;
+      // Adres adımına geçildiğinde sayfayı 1'e sıfırla
+      if (step === 3) {
+        this.currentAddressPage = 1;
+      }
     }
   }
 
   enableEdit(step: number): void {
-    if (step === 2 || step === 3) return; // Account ve Address düzenlenemez
+    if (step === 2 || step === 3) return; 
     this.editingSteps[step] = true;
-    this.formBackup = JSON.parse(JSON.stringify(this.customerForm.value)); // Derin kopya al
+    this.formBackup = JSON.parse(JSON.stringify(this.customerForm.value)); 
     this.enableFormControls(step);
   }
 
@@ -174,7 +236,7 @@ export class CustomerInfo implements OnInit {
     if (this.isStepValid(step)) {
       this.editingSteps[step] = false;
       this.disableFormControls(step);
-      this.formBackup = JSON.parse(JSON.stringify(this.customerForm.value)); // Yeni veriyi yedekle
+      this.formBackup = JSON.parse(JSON.stringify(this.customerForm.value)); 
       console.log(`Adım ${step} kaydedildi. Yeni Veriler:`, this.customerForm.value);
       alert(`Adım ${step} bilgileri başarıyla güncellendi!`);
     } else {
@@ -183,9 +245,9 @@ export class CustomerInfo implements OnInit {
     }
   }
 
-  // --- Yardımcı Metotlar ---
+  // --- Yardımcı Metotlar (Güncellendi) ---
   
-  private disableFormControls(step: number = 0): void {
+  private disableFormControls(step: number = 1): void {
     const controls = this.getControlsForStep(step);
     controls.forEach(controlName => this.customerForm.get(controlName)?.disable());
   }
@@ -202,7 +264,7 @@ export class CustomerInfo implements OnInit {
       case 2:
         return this.customerAccountControls; 
       case 3:
-        return this.addressInfoControls; 
+        return []; // Adres bilgileri listelendiği için Form Kontrolü yok
       case 4:
         return this.contactMediumControls;
       default:
@@ -214,7 +276,7 @@ export class CustomerInfo implements OnInit {
   isStepValid(step: number): boolean {
     const controls = this.getControlsForStep(step);
     
-    if (step === 2 || step === 3) return true; // Boş adımlar her zaman geçerli
+    if (step === 2 || step === 3) return true; // Boş/Listeleme adımları her zaman geçerli
 
     return controls.every(c => this.customerForm.get(c)?.valid);
   }
