@@ -11,6 +11,7 @@ export interface CustomerListResponse {
   natId: string
   contactMediums: ContactMedium[]
   addressSearches: AddressSearch[]
+  billingAccountSearches: BillingAccountSearch[]
 }
 
 export interface ContactMedium {
@@ -32,4 +33,16 @@ export interface AddressSearch {
   customerId: string
   cityId: string
   cityName: string
+}
+
+export interface BillingAccountSearch {
+  id: string
+  customerId: string
+  addressId: string
+  statusId: string
+  typeId: string
+  accountNumber: string
+  accountName: string
+  typeName: string
+  statusName: string
 }
