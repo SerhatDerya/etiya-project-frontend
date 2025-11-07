@@ -19,10 +19,18 @@
                         type="text" 
                         id="nat_id" 
                         formControlName="natId"
-                        class="w-full p-2 text-sm rounded border border-[#f58220] focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white 
-                                disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60"  style="border-color: #f58220; color: #242441;"
+                        class="w-full p-2 text-sm rounded border focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white 
+                                disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60" 
+                        style="border-color: #f58220; color: #242441;"
                         placeholder="Enter ID"
                     >
+                    @if (searchForm.get('natId')?.invalid && (searchForm.get('natId')?.dirty || searchForm.get('natId')?.touched)) {
+                        <div class="bg-red-500 text-white text-xs mt-1 p-1 rounded">
+                            @if (searchForm.get('natId')?.errors?.['pattern']) {
+                                NAT ID must be an 11-digit number.
+                            }
+                        </div>
+                    }
                 </div>
 
                 <div>
@@ -55,10 +63,18 @@
                         type="text" 
                         id="gsm_number" 
                         formControlName="gsmNumber"
-                        class="w-full p-2 text-sm rounded border border-[#f58220] focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white 
-                                disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60"  style="border-color: #f58220; color: #242441;"
+                        class="w-full p-2 text-sm rounded border focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white 
+                                disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60" 
+                        style="border-color: #f58220; color: #242441;"
                         placeholder="Enter GSM"
                     >
+                    @if (searchForm.get('gsmNumber')?.invalid && (searchForm.get('gsmNumber')?.dirty || searchForm.get('gsmNumber')?.touched)) {
+                        <div class="bg-red-500 text-white text-xs mt-1 p-1 rounded">
+                            @if (searchForm.get('gsmNumber')?.errors?.['pattern']) {
+                                GSM Number must be between 10 to 15 digits.
+                            }
+                        </div>
+                    }
                 </div>
 
                 <div>

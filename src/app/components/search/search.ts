@@ -45,10 +45,10 @@ export class Search {
 
   ngOnInit(): void {
     this.searchForm = this.fb.group({
-      natId: ['', Validators.pattern('^\\d{11}$')],
+      natId: ['', Validators.pattern('^\\d{10}[02468]$')],
       customerId: [''],
       accountNumber: [''],
-      gsmNumber: [''],
+      gsmNumber: ['', Validators.pattern('^\\+?\\d{10,15}$')],
       orderNumber: [''],
       firstName: [''],
       lastName: [''],

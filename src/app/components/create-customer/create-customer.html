@@ -30,35 +30,12 @@
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
             <div>
-              <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+              <label for="firstName" class="block text-sm font-medium text-gray-700">First Name*</label>
               <input id="firstName" type="text" formControlName="firstName" 
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
               @if (customerForm.get('firstName')?.invalid && customerForm.get('firstName')?.touched) {
-                <p class="mt-1 text-xs text-red-600">First Name zorunludur.</p>
+                <p class="mt-1 text-xs text-red-600">First Name is required (2-20 characters)</p>
               }
-            </div>
-            
-            <div>
-              <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
-              <input id="lastName" type="text" formControlName="lastName" 
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-
-            <div>
-              <label for="gender" class="block text-sm font-medium text-gray-700">Gender</label>
-              <select id="gender" formControlName="gender" 
-                      class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500 bg-white">
-                <option value="" disabled>Seçiniz</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="motherName" class="block text-sm font-medium text-gray-700">Mother Name</label>
-              <input id="motherName" type="text" formControlName="motherName"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
             </div>
 
             <div>
@@ -66,24 +43,71 @@
               <input id="middleName" type="text" formControlName="middleName"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
             </div>
+            
+            <div>
+              <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name*</label>
+              <input id="lastName" type="text" formControlName="lastName" 
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+              @if (customerForm.get('lastName')?.invalid && customerForm.get('lastName')?.touched) {
+                <p class="mt-1 text-xs text-red-600">Last Name is required (2-20 characters)</p>
+              }
+            </div>
 
             <div>
-              <label for="birthDate" class="block text-sm font-medium text-gray-700">Birth Date</label>
+              <label for="birthDate" class="block text-sm font-medium text-gray-700">Birth Date*</label>
               <input id="birthDate" type="date" formControlName="birthDate" 
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+              @if (customerForm.get('birthDate')?.invalid && (customerForm.get('birthDate')?.dirty || customerForm.get('birthDate')?.touched)) {
+                  <div class="text-red-500 text-xs mt-1">
+                      @if (customerForm.get('birthDate')?.errors?.['required']) {
+                          Birth Date is required.
+                      }
+                      @if (customerForm.get('birthDate')?.errors?.['minAgeRequired']) {
+                          Customer must be at least 16 years old.
+                      }
+                  </div>
+              }
+            </div>
+
+            <div>
+              <label for="gender" class="block text-sm font-medium text-gray-700">Gender*</label>
+              <select id="gender" formControlName="gender" 
+                      class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                <option value="" disabled>Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="PreferNotToSay">Prefer not to say</option>
+              </select>
             </div>
 
             <div>
               <label for="fatherName" class="block text-sm font-medium text-gray-700">Father Name</label>
               <input id="fatherName" type="text" formControlName="fatherName"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+              @if (customerForm.get('fatherName')?.invalid && customerForm.get('fatherName')?.touched) {
+                <p class="mt-1 text-xs text-red-600">Father Name must be between 2-20 characters.</p>
+              }
             </div>
 
             <div>
-              <label for="nationalityId" class="block text-sm font-medium text-gray-700">Nationality ID</label>
+              <label for="motherName" class="block text-sm font-medium text-gray-700">Mother Name</label>
+              <input id="motherName" type="text" formControlName="motherName"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+              @if (customerForm.get('motherName')?.invalid && customerForm.get('motherName')?.touched) {
+                <p class="mt-1 text-xs text-red-600">Mother Name must be between 2-20 characters.</p>
+              }
+            </div>
+
+            <div>
+              <label for="nationalityId" class="block text-sm font-medium text-gray-700">Nationality ID*</label>
               <input id="nationalityId" type="text" formControlName="nationalityId" 
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+              @if (customerForm.get('nationalityId')?.invalid && customerForm.get('nationalityId')?.touched) {
+                <p class="mt-1 text-xs text-red-600">NAT ID must be an 11-digit number.</p>
+              }
             </div>
+            <br>
+            <div>(*) Required fields</div>
           </div>
           
           <div class="pt-5 border-t mt-8 flex justify-end space-x-3">
@@ -379,15 +403,21 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             <div>
-              <label for="email" class="block text-sm font-medium text-gray-700">E-mail</label>
+              <label for="email" class="block text-sm font-medium text-gray-700">E-mail*</label>
               <input id="email" type="email" formControlName="email" 
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+              @if (customerForm.get('email')?.invalid && customerForm.get('email')?.touched) {
+                <p class="mt-1 text-xs text-red-600">E-mail must be valid e-mail address!</p>
+              }
             </div>
             
             <div>
-              <label for="mobilePhone" class="block text-sm font-medium text-gray-700">Mobile Phone</label>
+              <label for="mobilePhone" class="block text-sm font-medium text-gray-700">Mobile Phone*</label>
               <input id="mobilePhone" type="tel" formControlName="mobilePhone" 
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+              @if (customerForm.get('mobilePhone')?.invalid && customerForm.get('mobilePhone')?.touched) {
+                <p class="mt-1 text-xs text-red-600">Please enter a valid mobile phone number (including area code)</p>
+              }
             </div>
 
             <div>
@@ -401,6 +431,9 @@
               <input id="fax" type="tel" formControlName="fax"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
             </div>
+
+            
+            <div>(*) Required fields</div>
           </div>
           
           <div class="pt-5 border-t mt-8 flex justify-between">

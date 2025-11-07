@@ -1,7 +1,7 @@
 // create-customer.component.ts (GÜNCELLENMİŞ)
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, AbstractControl } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, AbstractControl, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CustomerService, } from '../../services/customer-service'; 
@@ -68,6 +68,28 @@ export class CreateCustomer implements OnInit {
 
   constructor(private fb: FormBuilder, private router: Router, private customerService: CustomerService) {}
 
+  ageValidator(minAge: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) {
+        return null; // Değer boşsa, zorunluluk (required) kontrolü halleder.
+      }
+
+      const birthDate = new Date(control.value);
+      const today = new Date();
+      
+      // Doğum tarihinden itibaren geçen yıl sayısını hesapla
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDifference = today.getMonth() - birthDate.getMonth();
+      
+      // Yıl farkı yetersizse veya yıl aynı, ancak ay/gün henüz dolmadıysa 1 yaş düşür.
+      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      return age >= minAge ? null : { minAgeRequired: { requiredAge: minAge, actualAge: age } };
+    };
+}
+
   ngOnInit(): void {
     // Şehir verilerini çekme işlemi (Değişmedi)
     this.customerService.getCities().subscribe({
@@ -86,19 +108,19 @@ export class CreateCustomer implements OnInit {
 
     // Ana Müşteri Formu
     this.customerForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(20)]],
+      lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(20)]],
       gender: ['', Validators.required],
-      motherName: [''],
-      middleName: [''],
+      motherName: ['', [Validators.minLength(2), Validators.maxLength(20)]],
+      middleName: ['', [Validators.minLength(2), Validators.maxLength(20)]],
       // API request'e uyum sağlamak için: dateOfBirth alanı
-      birthDate: ['', Validators.required], 
-      fatherName: [''],
-      nationalityId: ['', [Validators.required, Validators.pattern('^[0-9]{11}$')]],
+      birthDate: ['', [Validators.required, this.ageValidator(16)]], // En az 16 yaş doğrulaması
+      fatherName: ['', [Validators.minLength(2), Validators.maxLength(20)]],
+      nationalityId: ['', [Validators.required, Validators.pattern('^\\d{10}[02468]$')]],
 
       // ... Contact Medium Group (Değişmedi)
       email: ['', [Validators.required, Validators.email]],
-      mobilePhone: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      mobilePhone: ['', [Validators.required, Validators.pattern('^\\+?\\d{10,15}$')]],
       homePhone: [''],
       fax: ['']
     });
@@ -171,6 +193,23 @@ export class CreateCustomer implements OnInit {
         return `${day}/${month}/${year}`; // DD/MM/YYYY formatına çevir
   }
 
+  private cleanFormData(data: any): any {
+    const cleanedData: any = {};
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        const value = data[key];
+
+        if (typeof value === 'string'&& value.trim() === '') {
+          // Boş veya sadece boşluk içeren stringleri temizle
+          cleanedData[key] = null;
+        } else {
+          cleanedData[key] = value;
+        }
+      }
+    }
+    return cleanedData;
+  }
+
   // YENİ/GÜNCELLENMİŞ createCustomer FONKSİYONU
   createCustomer() {
     const contactMediumControls = ['email', 'mobilePhone'];
@@ -180,18 +219,19 @@ export class CreateCustomer implements OnInit {
       // 1. CreateCustomerRequest Hazırlama
 
       const customerFormData = this.customerForm.value;
-      
-      const formattedBirthDate = this.formatDateForApi(customerFormData.birthDate);
-      
+      const cleanedData = this.cleanFormData(customerFormData);
+
+      const formattedBirthDate = this.formatDateForApi(cleanedData.birthDate);
+
       const createCustomerRequest: CreateCustomerRequest = {
-                firstName: customerFormData.firstName,
-                middleName: customerFormData.middleName,
-                lastName: customerFormData.lastName,
+                firstName: cleanedData.firstName,
+                middleName: cleanedData.middleName,
+                lastName: cleanedData.lastName,
                 dateOfBirth: formattedBirthDate, // <-- Formatlanmış değeri kullan
-                gender: customerFormData.gender,
-                motherName: customerFormData.motherName,
-                fatherName: customerFormData.fatherName,
-                natId: customerFormData.nationalityId
+                gender: cleanedData.gender,
+                motherName: cleanedData.motherName,
+                fatherName: cleanedData.fatherName,
+                natId: cleanedData.nationalityId
             };
 
       console.log('1. Müşteri Oluşturma Başlatılıyor:', createCustomerRequest);
@@ -205,10 +245,10 @@ export class CreateCustomer implements OnInit {
           
           // 2. CreateContactMediumsRequest Hazırlama
           const createContactMediumsRequest: CreateContactMediumsRequest = {
-            email: customerFormData.email,
-            homePhone: customerFormData.homePhone,
-            mobilePhone: customerFormData.mobilePhone,
-            fax: customerFormData.fax,
+            email: cleanedData.email,
+            homePhone: cleanedData.homePhone,
+            mobilePhone: cleanedData.mobilePhone,
+            fax: cleanedData.fax,
             customerId: customerId
           };
 
