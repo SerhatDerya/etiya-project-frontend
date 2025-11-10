@@ -25,7 +25,7 @@ interface Address {
   id: number;
   title: string;
   cityName: string; // Görünümde kullanılacak isim
-  cityId: string;   // API'a gönderilecek ID
+  cityId: number;   // API'a gönderilecek ID
   street: string;
   houseNumber: string;
   description: string;
@@ -98,11 +98,6 @@ export class CreateCustomer implements OnInit {
       },
       error: (err) => {
         console.error('Şehirler çekilirken hata oluştu:', err);
-        this.cityList = [
-             { id: '34', name: 'İstanbul' },
-             { id: '06', name: 'Ankara' },
-             { id: '35', name: 'İzmir' },
-        ];
       }
     });
 
@@ -320,7 +315,7 @@ export class CreateCustomer implements OnInit {
 
       console.log("Form cityId değeri:", this.newAddressForm.value.cityId);
       
-      const selectedCity = this.cityList.find(c => c.id === this.newAddressForm.value.cityId);
+      const selectedCity = this.cityList.find(c => c.id.toString() === this.newAddressForm.value.cityId);
       
       const newAddress: Address = {
         id: this.addressList.length > 0 ? Math.max(...this.addressList.map(a => a.id)) + 1 : 1,

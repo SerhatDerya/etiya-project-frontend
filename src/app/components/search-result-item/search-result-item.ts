@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
   styleUrl: './search-result-item.scss',
 })
 export class SearchResultItem {
+  @Input() id!: string;
   @Input() customerId!: string;
   @Input() firstName!: string;
   @Input() middleName!: string;
@@ -17,7 +18,7 @@ export class SearchResultItem {
   constructor(private router: Router) {}
 
   onCustomerInfo(customerId: string): void {
-    localStorage.setItem('selectedCustomerNatId', this.natId);
+    localStorage.setItem('selectedCustomerId', this.id);
     this.router.navigateByUrl(`/b2c/customer-info/${customerId}`);
   }
 

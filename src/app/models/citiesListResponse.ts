@@ -1,6 +1,6 @@
 export type CitiesListResponse = City[];
 
 export interface City {
-  id: string;
+  id: number;
   name: string;
 }

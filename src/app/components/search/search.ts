@@ -84,7 +84,7 @@ export class Search {
 
   onSubmit(): void {
     if(this.searchForm.valid){
-      console.log(this.searchForm.value);
+      //console.log(this.searchForm.value);
       this.fetchCustomers();
       this.currentPage.set(1);
     }else{

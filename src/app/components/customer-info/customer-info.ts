@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CustomerService } from '../../services/customer-service';
@@ -18,6 +18,7 @@ export class CustomerInfo implements OnInit {
 
   currentStep = 1;
   customerForm!: FormGroup;
+  customerId: string = '';
 
   editingSteps: { [key: number]: boolean } = { 1: false, 2: false, 3: false, 4: false };
   formBackup: any = {};
@@ -54,7 +55,8 @@ export class CustomerInfo implements OnInit {
     private fb: FormBuilder,
     private customerService: CustomerService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -89,27 +91,28 @@ export class CustomerInfo implements OnInit {
    */
   loadCustomerData(): void {
     const params = new URLSearchParams();
-    params.append('natId', localStorage.getItem('selectedCustomerNatId') || '');
+    params.append('id', localStorage.getItem('selectedCustomerId') || '');
 
     this.customerService.getCustomers(params).subscribe({
       next: (response) => {
         if (response && response.length > 0) {
           const customerData = response[0];
           console.log('Müşteri verisi:', customerData);
+          setTimeout(() => this.cd.detectChanges());
           this.patchCustomerInfo(customerData);
 
           // 👇 Artık hesaplar da bu nesnenin içinden geliyor
           this.billingAccounts = customerData.billingAccountSearches || [];
           console.log('Billing Accounts (müşteriden):', this.billingAccounts);
 
+
         } else {
-          console.warn('Müşteri verisi bulunamadı. Simülasyon verileri kullanılıyor.');
-          this.patchDefaultValues();
+          alert('Müşteri verisi bulunamadı.');
         }
       },
       error: (error) => {
+        alert('Müşteri verisi yüklenirken bir hata oluştu.');
         console.error('Müşteri verisi yüklenirken hata oluştu:', error);
-        this.patchDefaultValues();
       }
     });
   }
@@ -118,6 +121,9 @@ export class CustomerInfo implements OnInit {
    * API'dan gelen müşteri verisini forma, adres listesine ve hesap listesine uygular.
    */
   private patchCustomerInfo(data: CustomerListResponse): void {
+
+    this.customerId = data.id;
+
     // 1️⃣ Müşteri Temel Bilgileri
     this.customerForm.patchValue({
       firstName: data.firstName,
@@ -141,8 +147,8 @@ export class CustomerInfo implements OnInit {
         ? data.contactMediums[0]
         : {};
     this.customerForm.patchValue({
-      email: contact.email || 'customer@loaded.com',
-      mobilePhone: contact.mobilePhone || '5559998877',
+      email: contact.email || '',
+      mobilePhone: contact.mobilePhone || '',
       homePhone: contact.homePhone || '',
       fax: contact.fax || ''
     });
@@ -157,40 +163,21 @@ export class CustomerInfo implements OnInit {
     this.formBackup = this.customerForm.value;
   }
 
-  private patchDefaultValues(): void {
-    this.customerForm.patchValue({
-      firstName: 'Simülasyon',
-      lastName: 'Müşterisi',
-      gender: 'other',
-      birthDate: '1970-01-01',
-      nationalityId: '00000000000',
-      email: 'default@test.com',
-      mobilePhone: '5551234567'
-    });
-
-    this.addressList = [
-      {
-        id: '1',
-        title: 'Default Ev',
-        street: 'Default Sk',
-        houseNumber: '1',
-        description: 'Varsayılan adres',
-        cityName: 'Virtual',
-        cityId: '0'
-      },
-      {
-        id: '2',
-        title: 'Default İş',
-        street: 'Default Cad',
-        houseNumber: '2',
-        description: 'Varsayılan iş adresi',
-        cityName: 'Virtual',
-        cityId: '0'
-      }
-    ] as AddressSearch[];
-
-
-    this.formBackup = this.customerForm.value;
+  deleteCustomer(): void {
+    const confirmDelete = confirm('Are you sure you want to delete this customer? This action cannot be undone.');
+    if (confirmDelete) {
+      // Müşteri silme işlemi
+      this.customerService.deleteCustomer(this.customerId).subscribe({
+        next: () => {
+          alert('Customer successfully deleted.');
+          this.router.navigate(['/']);
+        },
+        error: (error) => {
+          alert('An error occurred while deleting the customer.');
+          console.error('An error occurred while deleting the customer:', error);
+        }
+      });
+    }
   }
 
   // --- Hesap Yönetimi ---

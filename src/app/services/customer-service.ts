@@ -36,6 +36,16 @@ export class CustomerService {
     });
   }
 
+  deleteCustomer(id: string) {
+    const url = `http://localhost:8091/customerservice/api/individual-customers/${id}`;
+    const token = localStorage.getItem('token');
+    return this.httpClient.delete(url, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+  }
+
   getCities() {
     const url = 'http://localhost:8091/customerservice/api/cities/';
     const token = localStorage.getItem('token');

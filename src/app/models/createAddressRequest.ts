@@ -5,5 +5,5 @@ export interface CreateAddressRequest {
   description: string
   isDefault: boolean
   customerId: string
-  cityId: string
+  cityId: number
 }
