@@ -6,6 +6,7 @@ import { CreateContactMediumsRequest } from '../models/createContactMediumsReque
 import { CreateAddressRequest } from '../models/createAddressRequest';
 import { CreateCustomerResponse } from '../models/createCustomerResponse';
 import { BillingAccountListResponse } from '../models/billingAccountListResponse';
+import { UpdateCustomerRequest } from '../models/updateCustomerRequest';
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +47,16 @@ export class CustomerService {
     });
   }
 
+  updateCustomer(id: string, request: UpdateCustomerRequest) {
+    const url = `http://localhost:8091/customerservice/api/individual-customers/${id}`;
+    const token = localStorage.getItem('token');
+    return this.httpClient.put(url, request, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+  }
+
   getCities() {
     const url = 'http://localhost:8091/customerservice/api/cities/';
     const token = localStorage.getItem('token');
@@ -66,11 +77,41 @@ export class CustomerService {
     });
   }
 
+  updateContactMediums(id: string, request: CreateContactMediumsRequest) {
+    const url = `http://localhost:8091/customerservice/api/contact-mediums/${id}`;
+    const token = localStorage.getItem('token');
+    return this.httpClient.put<any>(url, request, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+  }
+
   createAddress(request: CreateAddressRequest) {
     const url = 'http://localhost:8091/customerservice/api/addresses/';
     const token = localStorage.getItem('token');
     console.log('Creating address with request:', request);
     return this.httpClient.post<any>(url, request, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+  }
+
+  updateAddress(id: string, request: CreateAddressRequest) {
+    const url = `http://localhost:8091/customerservice/api/addresses/${id}`;
+    const token = localStorage.getItem('token');
+    return this.httpClient.put<any>(url, request, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+  }
+
+  deleteAddress(id: string) {
+    const url = `http://localhost:8091/customerservice/api/addresses/${id}`;
+    const token = localStorage.getItem('token');
+    return this.httpClient.delete(url, {
       headers: {
         Authorization: 'Bearer ' + token
       }

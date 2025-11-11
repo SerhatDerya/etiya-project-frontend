@@ -18,6 +18,7 @@ export class SearchResultItem {
   constructor(private router: Router) {}
 
   onCustomerInfo(customerId: string): void {
+    localStorage.setItem('selectedCustomerNumber', this.customerId);
     localStorage.setItem('selectedCustomerId', this.id);
     this.router.navigateByUrl(`/b2c/customer-info/${customerId}`);
   }
