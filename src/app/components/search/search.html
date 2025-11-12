@@ -38,7 +38,7 @@
                     <input 
                         type="text" 
                         id="customer_id" 
-                        formControlName="customerId"
+                        formControlName="customerNumber"
                         class="w-full p-2 text-sm rounded border border-[#f58220] focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white 
                                 disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60"  style="border-color: #f58220; color: #242441;"
                         placeholder="Enter Customer ID"
@@ -62,15 +62,15 @@
                     <input 
                         type="text" 
                         id="gsm_number" 
-                        formControlName="gsmNumber"
+                        formControlName="mobilePhone"
                         class="w-full p-2 text-sm rounded border focus:ring-2 focus:ring-[#f58220] focus:ring-offset-0 focus:outline-none bg-white 
                                 disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60" 
                         style="border-color: #f58220; color: #242441;"
                         placeholder="Enter GSM"
                     >
-                    @if (searchForm.get('gsmNumber')?.invalid && (searchForm.get('gsmNumber')?.dirty || searchForm.get('gsmNumber')?.touched)) {
+                    @if (searchForm.get('mobilePhone')?.invalid && (searchForm.get('mobilePhone')?.dirty || searchForm.get('mobilePhone')?.touched)) {
                         <div class="bg-red-500 text-white text-xs mt-1 p-1 rounded">
-                            @if (searchForm.get('gsmNumber')?.errors?.['pattern']) {
+                            @if (searchForm.get('mobilePhone')?.errors?.['pattern']) {
                                 GSM Number must be between 10 to 15 digits.
                             }
                         </div>

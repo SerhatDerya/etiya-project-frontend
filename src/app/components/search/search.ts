@@ -16,8 +16,8 @@ import { Router } from '@angular/router';
 export class Search {
 
   searchForm !: FormGroup;
-  
-  primaryFields = ['natId', 'customerId', 'accountNumber', 'gsmNumber', 'orderNumber'];
+
+  primaryFields = ['natId', 'customerNumber', 'accountNumber', 'mobilePhone', 'orderNumber'];
 
   customersResponse = signal<CustomerListResponse[] | undefined>(undefined);
 
@@ -73,9 +73,9 @@ export class Search {
   ngOnInit(): void {
     this.searchForm = this.fb.group({
       natId: ['', Validators.pattern('^\\d{10}[02468]$')],
-      customerId: [''],
+      customerNumber: [''],
       accountNumber: [''],
-      gsmNumber: ['', Validators.pattern('^\\+?\\d{10,15}$')],
+      mobilePhone: ['', Validators.pattern('^\\+?\\d{10,15}$')],
       orderNumber: [''],
       firstName: [''],
       lastName: [''],
