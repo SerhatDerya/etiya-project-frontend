@@ -101,7 +101,10 @@ export class Search {
   }
 
   updateFieldStates(changedField: string): void {
-    if (this.searchForm.get(changedField)?.value.toString().trim() !== '') {
+    const fieldValue = this.searchForm.get(changedField)?.value;
+    
+    // null/undefined kontrolü ekle
+    if (fieldValue !== null && fieldValue !== undefined && fieldValue.toString().trim() !== '') {
       this.primaryFields.forEach(fieldName => {
         if (fieldName !== changedField) {
           this.searchForm.get(fieldName)?.disable({ emitEvent: false });
@@ -137,8 +140,9 @@ export class Search {
     });
     // Form değişikliğini tetikle
     this.formChanges.update(v => v + 1);
-    //this.customersResponse.set(undefined);
-    //this.currentPage.set(0);
+    // Sonuçları da temizle
+    this.customersResponse.set(undefined);
+    this.currentPage.set(0);
   }
 
   isDirty(): boolean {
