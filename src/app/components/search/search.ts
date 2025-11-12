@@ -21,6 +21,9 @@ export class Search {
 
   customersResponse = signal<CustomerListResponse[] | undefined>(undefined);
 
+  // Form değişikliklerini takip etmek için signal
+  formChanges = signal<number>(0);
+
   constructor(private customerService: CustomerService, private fb : FormBuilder, private router : Router) {}
 
   // Sayfalama için signal'lar
@@ -28,6 +31,30 @@ export class Search {
   pageSize = signal(20); // Her sayfada 20 müşteri
 
   isLoading = signal(false);
+
+  // Form geçerli mi kontrolü (computed) - Sadece doldurulmuş alanları kontrol et
+  isFormValid = computed(() => {
+    // formChanges'i oku (reactive olması için)
+    this.formChanges();
+
+    if (!this.searchForm || !this.isDirty()) {
+      return false;
+    }
+
+    // Sadece doldurulmuş alanların valid olup olmadığını kontrol et
+    return Object.keys(this.searchForm.controls).every(fieldName => {
+      const control = this.searchForm.get(fieldName);
+      const value = control?.value;
+      
+      // Eğer alan boşsa, geçerli kabul et
+      if (!value || value.toString().trim() === '') {
+        return true;
+      }
+      
+      // Eğer alan doluysa, valid olup olmadığını kontrol et
+      return control?.valid ?? true;
+    });
+  });
   
   // Toplam sayfa sayısı (computed)
   totalPages = computed(() => {
@@ -55,6 +82,12 @@ export class Search {
     });
 
     this.setupPrimaryFieldsControl();
+
+    // Form değişikliklerini dinle
+    this.searchForm.valueChanges.subscribe(() => {
+      this.formChanges.update(v => v + 1);
+    });
+
     this.isDirty();
     this.currentPage.set(0);
   }
@@ -102,6 +135,8 @@ export class Search {
     this.primaryFields.forEach(fieldName => {
       this.searchForm.get(fieldName)?.enable({ emitEvent: false });
     });
+    // Form değişikliğini tetikle
+    this.formChanges.update(v => v + 1);
     //this.customersResponse.set(undefined);
     //this.currentPage.set(0);
   }
