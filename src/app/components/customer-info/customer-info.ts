@@ -474,6 +474,69 @@ export class CustomerInfo implements OnInit {
     }
   }
 
+  setPrimaryAddress(addressId: string): void {
+    const selectedAddress = this.addressList.find(a => a.id === addressId);
+    const currentPrimaryAddress = this.addressList.find(a => a.isDefault && a.id !== addressId);
+    
+    if (!selectedAddress) return;
+
+    // Eğer zaten primary ise işlem yapma
+    if (selectedAddress.isDefault) return;
+
+    // Yeni primary adresi API'ye güncelle
+    const newPrimaryRequest: CreateAddressRequest = {
+      title: selectedAddress.title,
+      street: selectedAddress.street,
+      houseNumber: selectedAddress.houseNumber,
+      description: selectedAddress.description,
+      isDefault: true,
+      customerId: this.customerId,
+      cityId: selectedAddress.cityId
+    };
+
+    this.customerService.updateAddress(addressId, newPrimaryRequest).subscribe({
+      next: () => {
+        // Local state'i güncelle
+        this.addressList.forEach(addr => {
+          if (addr.id === addressId) {
+            addr.isDefault = true;
+          } else {
+            addr.isDefault = false;
+          }
+        });
+        
+        // Eski primary varsa API'de false yap
+        if (currentPrimaryAddress) {
+          const oldPrimaryRequest: CreateAddressRequest = {
+            title: currentPrimaryAddress.title,
+            street: currentPrimaryAddress.street,
+            houseNumber: currentPrimaryAddress.houseNumber,
+            description: currentPrimaryAddress.description,
+            isDefault: false,
+            customerId: this.customerId,
+            cityId: currentPrimaryAddress.cityId
+          };
+
+          this.customerService.updateAddress(currentPrimaryAddress.id, oldPrimaryRequest).subscribe({
+            next: () => {
+              console.log('Eski primary adres güncellendi');
+            },
+            error: (error) => {
+              console.error('Eski primary adres güncellenirken hata:', error);
+            }
+          });
+        }
+        
+        this.cd.detectChanges();
+      },
+      error: (error) => {
+        this.modalMessage = error.error?.detail || error.error?.message || error.message || 'An error occurred while updating primary address.';
+        this.showErrorModal = true;
+        console.error('Primary adres güncellenirken hata:', error);
+      }
+    });
+  }
+
   deleteAddress(addressId: string): void {
     this.addressToDelete = addressId;
     this.showDeleteAddressConfirmModal = true;

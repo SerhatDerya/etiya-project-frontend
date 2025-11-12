@@ -250,7 +250,7 @@
                 <div>
                   <label for="addressTitle" class="block text-sm font-medium text-gray-700">Address Title</label>
                   <input id="addressTitle" type="text" formControlName="title" 
-                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
                   @if (newAddressForm.get('title')?.invalid && newAddressForm.get('title')?.touched) {
                     <p class="mt-1 text-xs text-red-600">Address Title is required.</p>
                   }
@@ -259,7 +259,7 @@
                 <div>
                   <label for="city" class="block text-sm font-medium text-gray-700">City</label>
                   <select id="city" formControlName="cityId" 
-                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
                     <option value="" disabled>Please Select a City</option>
                     @for (city of cityList; track city.id) {
                       <option [value]="city.id">{{ city.name }}</option>
@@ -273,7 +273,7 @@
                 <div>
                   <label for="street" class="block text-sm font-medium text-gray-700">Street</label>
                   <input id="street" type="text" formControlName="street" 
-                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
                   @if (newAddressForm.get('street')?.invalid && newAddressForm.get('street')?.touched) {
                     <p class="mt-1 text-xs text-red-600">Street is required.</p>
                   }
@@ -282,7 +282,7 @@
                 <div>
                   <label for="houseNumber" class="block text-sm font-medium text-gray-700">House/Flat Number</label>
                   <input id="houseNumber" type="text" formControlName="houseNumber" 
-                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
                   @if (newAddressForm.get('houseNumber')?.invalid && newAddressForm.get('houseNumber')?.touched) {
                     <p class="mt-1 text-xs text-red-600">House/Flat Number is required.</p>
                   }
@@ -299,7 +299,7 @@
 
                 <div class="flex items-center pt-3 md:col-span-3">
                   <input id="isDefault" type="checkbox" formControlName="isDefault"
-                         class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                   <label for="isDefault" class="ml-2 block text-sm font-medium text-gray-700">
                     Set as Primary Address
                   </label>
@@ -328,7 +328,7 @@
                 <div>
                   <label for="editTitle" class="block text-sm font-medium text-gray-700">Address Title</label>
                   <input id="editTitle" type="text" formControlName="title" 
-                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
                   @if (editAddressForm.get('title')?.invalid && editAddressForm.get('title')?.touched) {
                     <p class="mt-1 text-xs text-red-600">Address Title is required.</p>
                   }
@@ -337,7 +337,7 @@
                 <div>
                   <label for="editCity" class="block text-sm font-medium text-gray-700">City</label>
                   <select id="editCity" formControlName="cityId" 
-                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
                     <option value="" disabled>Please Select a City</option>
                     @for (city of cityList; track city.id) {
                       <option [value]="city.id">{{ city.name }}</option>
@@ -351,7 +351,7 @@
                 <div>
                   <label for="editStreet" class="block text-sm font-medium text-gray-700">Street</label>
                   <input id="editStreet" type="text" formControlName="street" 
-                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
                   @if (editAddressForm.get('street')?.invalid && editAddressForm.get('street')?.touched) {
                     <p class="mt-1 text-xs text-red-600">Street is required.</p>
                   }
@@ -360,7 +360,7 @@
                 <div>
                   <label for="editHouseNumber" class="block text-sm font-medium text-gray-700">House/Flat Number</label>
                   <input id="editHouseNumber" type="text" formControlName="houseNumber" 
-                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
                   @if (editAddressForm.get('houseNumber')?.invalid && editAddressForm.get('houseNumber')?.touched) {
                     <p class="mt-1 text-xs text-red-600">House/Flat Number is required.</p>
                   }
@@ -377,7 +377,7 @@
 
                 <div class="flex items-center pt-3 md:col-span-3">
                   <input id="editIsDefault" type="checkbox" formControlName="isDefault"
-                         class="h-4 w-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500">
+                        class="h-4 w-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500">
                   <label for="editIsDefault" class="ml-2 block text-sm font-medium text-gray-700">
                     Set as Primary Address
                   </label>
@@ -423,34 +423,31 @@
                       </svg>
                     </button>
                   }
-    
+
                   <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
                     @for (address of getDisplayedAddresses(); track address.id) {
                       <div class="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
-                        <div class="flex justify-between items-start mb-2">
-                           <h4 class="text-lg font-semibold text-gray-900 flex items-center">
-                            {{ address.title }} 
-                            @if (address.isDefault) {
-                              <span class="text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full ml-3">Primary</span>
-                            }
+                        <div class="flex justify-between items-start mb-3">
+                          <h4 class="text-lg font-semibold text-gray-900">
+                            {{ address.title }}
                           </h4>
                           <div class="flex space-x-2">
-                             <button type="button" (click)="editAddress(address)" title="Edit"
-                                      class="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-100 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
-                             </button>
-                             <button type="button" (click)="deleteAddress(address.id)" title="Delete"
-                                      class="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                             </button>
+                            <button type="button" (click)="editAddress(address)" title="Edit"
+                                    class="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-100 transition-colors">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                              </svg>
+                            </button>
+                            <button type="button" (click)="deleteAddress(address.id)" title="Delete"
+                                    class="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
                           </div>
                         </div>
                         
-                        <div class="space-y-2 text-sm text-gray-700">
+                        <div class="space-y-2 text-sm text-gray-700 mb-4">
                           <div>
                             <span class="font-medium">City:</span> {{ address.cityName || 'N/A' }}
                           </div>
@@ -464,13 +461,36 @@
                             <span class="font-medium">Description:</span> {{ address.description || 'N/A' }}
                           </div>
                         </div>
+
+                        <!-- Sağ alt kısım: Primary badge ve butonlar -->
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-200">
+                          <div class="flex items-center">
+                            <!-- Radio button for primary address -->
+                            <input 
+                              type="radio" 
+                              [id]="'primary-' + address.id"
+                              [name]="'primaryAddress'"
+                              [checked]="address.isDefault"
+                              (change)="setPrimaryAddress(address.id)"
+                              class="h-4 w-4 border-gray-300 mr-2 cursor-pointer "
+                              [style.accent-color]="address.isDefault ? '#16a34a' : '#9ca3af'"
+                            />
+                            <label [for]="'primary-' + address.id" class="cursor-pointer">
+                              @if (address.isDefault) {
+                                <span class="text-xs font-medium text-green-700 bg-green-100 px-2 py-1 rounded-full">Primary</span>
+                              } @else {
+                                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Not Primary</span>
+                              }
+                            </label>
+                          </div>
+                        </div>
                       </div>
                     }
                     @if (getDisplayedAddresses().length === 1 && addressesPerPage === 2) {
                       <div></div>
                     }
                   </div>
-    
+
                   @if (shouldShowNextArrow()) {
                     <button type="button" (click)="nextAddressPage()" class="p-2 ml-2 rounded-full hover:bg-gray-200 disabled:opacity-50" [disabled]="currentAddressPage === totalAddressPages">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -479,7 +499,7 @@
                     </button>
                   }
                 </div>
-    
+
                 @if (totalAddressPages > 1) {
                   <div class="mt-4 text-center text-sm text-gray-600">
                     Page {{ currentAddressPage }} / {{ totalAddressPages }}

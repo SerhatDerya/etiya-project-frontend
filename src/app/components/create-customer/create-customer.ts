@@ -320,9 +320,14 @@ export class CreateCustomer implements OnInit {
     this.showErrorModal = false;
   }
 
-  // --- Yeni Adres Ekleme İşlevleri (GÜNCELLENMİŞ) ---
+  // --- Yeni Adres Ekleme İşlevleri ---
 
-  // ... (addNewAddress, cancelNewAddress fonksiyonları cityId'ye uygun güncellendi) ...
+  // Primary adres seçimi için metod
+  setPrimaryAddress(addressId: number): void {
+    this.addressList.forEach(addr => {
+      addr.isDefault = addr.id === addressId;
+    });
+  }
 
   addNewAddress() {
     this.isAddingNewAddress = true;
