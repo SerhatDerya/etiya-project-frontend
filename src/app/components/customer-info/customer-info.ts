@@ -627,11 +627,7 @@ export class CustomerInfo implements OnInit {
             this.editingSteps[step] = false;
             this.disableFormControls(step);
             this.formBackup = this.customerForm.getRawValue();
-            this.modalMessage = 'Customer information updated successfully.';
-            this.showSuccessModal = true;
-            setTimeout(() => {
-              this.showSuccessModal = false;
-            }, 2000);
+            // Success modal kaldırıldı
           },
           error: (error) => {
             this.enableFormControls(step);
@@ -645,58 +641,58 @@ export class CustomerInfo implements OnInit {
           }
         });
       } else if (step === 4) {
-      // Contact medium update
-      const contactMediumRequest: CreateContactMediumsRequest = {
-        email: this.customerForm.controls['email'].value,
-        mobilePhone: this.customerForm.controls['mobilePhone'].value,
-        homePhone: this.customerForm.controls['homePhone'].value,
-        fax: this.customerForm.controls['fax'].value,
-        customerId: this.customerId
-      };
+        // Contact medium update
+        const contactMediumRequest: CreateContactMediumsRequest = {
+          email: this.customerForm.controls['email'].value,
+          mobilePhone: this.customerForm.controls['mobilePhone'].value,
+          homePhone: this.customerForm.controls['homePhone'].value,
+          fax: this.customerForm.controls['fax'].value,
+          customerId: this.customerId
+        };
 
-      if (this.contactMediumId) {
-        // Update existing contact medium
-        this.customerService.updateContactMediums(this.contactMediumId, contactMediumRequest).subscribe({
-          next: () => {
-            this.editingSteps[step] = false;
-            this.disableFormControls(step);
-            this.formBackup = this.customerForm.getRawValue();
-            // Success modal kaldırıldı
-          },
-          error: (error) => {
-            this.enableFormControls(step);
-            this.customerForm.patchValue(this.formBackup, { emitEvent: false });
-            this.disableFormControls(step);
-            this.editingSteps[step] = false;
-            this.cd.detectChanges();
-            
-            this.modalMessage = error.error?.detail || error.error?.message || error.message || 'An error occurred while updating contact information.';
-            this.showErrorModal = true;
-          }
-        });
-      } else {
-        // Create new contact medium if doesn't exist
-        this.customerService.createContactMediums(contactMediumRequest).subscribe({
-          next: (response: any) => {
-            this.contactMediumId = response.id || response.data?.id || '';
-            this.editingSteps[step] = false;
-            this.disableFormControls(step);
-            this.formBackup = this.customerForm.getRawValue();
-            // Success modal kaldırıldı
-          },
-          error: (error) => {
-            this.enableFormControls(step);
-            this.customerForm.patchValue(this.formBackup, { emitEvent: false });
-            this.disableFormControls(step);
-            this.editingSteps[step] = false;
-            this.cd.detectChanges();
-            
-            this.modalMessage = error.error?.detail || error.error?.message || error.message || 'An error occurred while creating contact information.';
-            this.showErrorModal = true;
-          }
-        });
+        if (this.contactMediumId) {
+          // Update existing contact medium
+          this.customerService.updateContactMediums(this.contactMediumId, contactMediumRequest).subscribe({
+            next: () => {
+              this.editingSteps[step] = false;
+              this.disableFormControls(step);
+              this.formBackup = this.customerForm.getRawValue();
+              // Success modal kaldırıldı
+            },
+            error: (error) => {
+              this.enableFormControls(step);
+              this.customerForm.patchValue(this.formBackup, { emitEvent: false });
+              this.disableFormControls(step);
+              this.editingSteps[step] = false;
+              this.cd.detectChanges();
+              
+              this.modalMessage = error.error?.detail || error.error?.message || error.message || 'An error occurred while updating contact information.';
+              this.showErrorModal = true;
+            }
+          });
+        } else {
+          // Create new contact medium if doesn't exist
+          this.customerService.createContactMediums(contactMediumRequest).subscribe({
+            next: (response: any) => {
+              this.contactMediumId = response.id || response.data?.id || '';
+              this.editingSteps[step] = false;
+              this.disableFormControls(step);
+              this.formBackup = this.customerForm.getRawValue();
+              // Success modal kaldırıldı
+            },
+            error: (error) => {
+              this.enableFormControls(step);
+              this.customerForm.patchValue(this.formBackup, { emitEvent: false });
+              this.disableFormControls(step);
+              this.editingSteps[step] = false;
+              this.cd.detectChanges();
+              
+              this.modalMessage = error.error?.detail || error.error?.message || error.message || 'An error occurred while creating contact information.';
+              this.showErrorModal = true;
+            }
+          });
+        }
       }
-    }
     } else {
       console.error(`Adım ${step} geçersiz. Lütfen zorunlu alanları doldurun.`);
       this.markControlsAsTouched(step);

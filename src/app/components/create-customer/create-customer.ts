@@ -1,6 +1,6 @@
 // create-customer.component.ts (GÜNCELLENMİŞ)
 
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, AbstractControl, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -62,11 +62,22 @@ export class CreateCustomer implements OnInit {
   // Sayfalama Yönetimi
   addressesPerPage: number = 2;
   currentAddressPage: number = 1;
+
+  // Modal kontrol değişkenleri
+  showSuccessModal: boolean = false;
+  showErrorModal: boolean = false;
+  modalMessage: string = '';
+
   get totalAddressPages(): number {
     return Math.ceil(this.addressList.length / this.addressesPerPage);
   }
 
-  constructor(private fb: FormBuilder, private router: Router, private customerService: CustomerService) {}
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private customerService: CustomerService,
+    private cd: ChangeDetectorRef
+  ) {}
 
   ageValidator(minAge: number): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -232,72 +243,82 @@ export class CreateCustomer implements OnInit {
 
   
   createCustomer() {
-  const contactMediumControls = ['email', 'mobilePhone'];
-  this.markControlsAsTouched(contactMediumControls);
-  
-  if (this.customerForm.valid) {
-    const customerFormData = this.customerForm.value;
-    const cleanedData = this.cleanFormData(customerFormData);
-    const formattedBirthDate = this.formatDateForApi(cleanedData.birthDate);
+    const contactMediumControls = ['email', 'mobilePhone'];
+    this.markControlsAsTouched(contactMediumControls);
+    
+    if (this.customerForm.valid) {
+      const customerFormData = this.customerForm.value;
+      const cleanedData = this.cleanFormData(customerFormData);
+      const formattedBirthDate = this.formatDateForApi(cleanedData.birthDate);
 
-    const createCustomerRequest: CreateCustomerRequest = {
-      firstName: cleanedData.firstName,
-      middleName: cleanedData.middleName,
-      lastName: cleanedData.lastName,
-      dateOfBirth: formattedBirthDate,
-      gender: cleanedData.gender,
-      motherName: cleanedData.motherName,
-      fatherName: cleanedData.fatherName,
-      natId: cleanedData.nationalityId
-    };
+      const createCustomerRequest: CreateCustomerRequest = {
+        firstName: cleanedData.firstName,
+        middleName: cleanedData.middleName,
+        lastName: cleanedData.lastName,
+        dateOfBirth: formattedBirthDate,
+        gender: cleanedData.gender,
+        motherName: cleanedData.motherName,
+        fatherName: cleanedData.fatherName,
+        natId: cleanedData.nationalityId
+      };
 
-    console.log('1️. Müşteri oluşturma başlatılıyor:', createCustomerRequest);
+      console.log('1️. Müşteri oluşturma başlatılıyor:', createCustomerRequest);
 
-    this.customerService.createCustomer(createCustomerRequest).pipe(
-      // 1. Müşteri oluşturuldu
-      switchMap((customerResponse: CreateCustomerResponse) => {
-        const customerId = customerResponse.id;
-        console.log(`2️. Müşteri ID alındı: ${customerId}. Şimdi adresler ekleniyor...`);
+      this.customerService.createCustomer(createCustomerRequest).pipe(
+        switchMap((customerResponse: CreateCustomerResponse) => {
+          const customerId = customerResponse.id;
+          console.log(`2️. Müşteri ID alındı: ${customerId}. Şimdi adresler ekleniyor...`);
 
-        // 2. Adresleri sırayla ekleme
-        return this.addAddressesSequentially(customerId).pipe(
-          map(() => customerId)
-        );
-      }),
-      // 3. Adresler bittikten sonra contact mediums ekleme
-      switchMap((customerId: string) => {
-        console.log(`3️. Adresler tamamlandı. Şimdi iletişim bilgileri ekleniyor...`);
-        const createContactMediumsRequest: CreateContactMediumsRequest = {
-          email: cleanedData.email,
-          homePhone: cleanedData.homePhone,
-          mobilePhone: cleanedData.mobilePhone,
-          fax: cleanedData.fax,
-          customerId
-        };
-        return this.customerService.createContactMediums(createContactMediumsRequest).pipe(
-          map(() => customerId)
-        );
-      }),
-      catchError(error => {
-        console.error('Zincirde hata oluştu:', error);
-        alert('Hata: Müşteri, Adres veya İletişim bilgisi eklenemedi.');
-        return of(null);
-      })
-    ).subscribe(customerId => {
-      if (customerId) {
-        console.log('Tüm işlemler başarıyla tamamlandı!');
-        alert(`Müşteri ${customerId} başarıyla oluşturuldu!`);
-        this.router.navigateByUrl('/b2c');
-      }
-    });
+          return this.addAddressesSequentially(customerId).pipe(
+            map(() => customerId)
+          );
+        }),
+        switchMap((customerId: string) => {
+          console.log(`3️. Adresler tamamlandı. Şimdi iletişim bilgileri ekleniyor...`);
+          const createContactMediumsRequest: CreateContactMediumsRequest = {
+            email: cleanedData.email,
+            homePhone: cleanedData.homePhone,
+            mobilePhone: cleanedData.mobilePhone,
+            fax: cleanedData.fax,
+            customerId
+          };
+          return this.customerService.createContactMediums(createContactMediumsRequest).pipe(
+            map(() => customerId)
+          );
+        }),
+        catchError(error => {
+          console.error('Zincirde hata oluştu:', error);
+          this.modalMessage = error.error?.detail || error.error?.message || error.message || 'An error occurred while creating customer.';
+          this.showErrorModal = true;
+          this.cd.detectChanges();
+          return of(null);
+        })
+      ).subscribe(customerId => {
+        if (customerId) {
+          console.log('Tüm işlemler başarıyla tamamlandı!');
+          this.modalMessage = 'Customer created successfully. You are now returning to the main page.';
+          this.showSuccessModal = true;
+          this.cd.detectChanges(); // Change detection'ı manuel tetikle
+          setTimeout(() => {
+            this.router.navigateByUrl('/b2c');
+          }, 3000);
+        }
+      });
 
-  } else {
-    console.error('Form geçersiz. Lütfen tüm alanları doldurun.');
-    this.customerForm.markAllAsTouched();
+    } else {
+      console.error('Form geçersiz. Lütfen tüm alanları doldurun.');
+      this.customerForm.markAllAsTouched();
+    }
   }
-}
 
+  closeSuccessModal(): void {
+    this.showSuccessModal = false;
+    this.router.navigateByUrl('/b2c');
+  }
 
+  closeErrorModal(): void {
+    this.showErrorModal = false;
+  }
 
   // --- Yeni Adres Ekleme İşlevleri (GÜNCELLENMİŞ) ---
 
