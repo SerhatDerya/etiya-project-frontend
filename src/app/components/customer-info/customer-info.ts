@@ -50,10 +50,12 @@ export class CustomerInfo implements OnInit {
   // Modal kontrol değişkenleri
   showDeleteConfirmModal: boolean = false;
   showDeleteAddressConfirmModal: boolean = false;
+  showDeleteAccountConfirmModal: boolean = false;
   showSuccessModal: boolean = false;
   showErrorModal: boolean = false;
   modalMessage: string = '';
   addressToDelete: string | null = null;
+  accountToDelete: Account | null = null;
 
   editingSteps: { [key: number]: boolean } = { 1: false, 2: false, 3: false, 4: false };
   formBackup: any = {};
@@ -288,7 +290,55 @@ export class CustomerInfo implements OnInit {
   }
 
   deleteAccount(account: Account): void {
-    alert(`Delete account: ${account.accountName}`);
+    this.accountToDelete = account;
+    this.showDeleteAccountConfirmModal = true;
+  }
+
+  cancelDeleteAccount(): void {
+    this.showDeleteAccountConfirmModal = false;
+    this.accountToDelete = null;
+  }
+
+  confirmDeleteAccount(): void {
+    if (!this.accountToDelete) return;
+
+    const accountToDelete = this.accountToDelete;
+    this.showDeleteAccountConfirmModal = false;
+
+    // Burada billing account silme API çağrısı yapılacak
+    // Örnek: this.customerService.deleteBillingAccount(accountToDelete.accountNumber).subscribe({
+    //   next: () => { ... },
+    //   error: (error) => { ... }
+    // });
+
+    this.customerService.deleteBillingAccount(this.accountToDelete.id).subscribe({
+      next: () => {
+        this.modalMessage = 'Customer account deleted successfully';
+        this.showSuccessModal = true;
+        this.accountToDelete = null;
+        this.cd.detectChanges();
+
+        this.billingAccounts = this.billingAccounts.filter(
+          acc => acc.accountNumber !== accountToDelete.accountNumber
+        );
+
+        setTimeout(() => {
+          this.showSuccessModal = false;
+          this.modalMessage = '';
+          this.cd.detectChanges();
+        }, 2000);
+      },
+      error: (error) => {
+        alert('An error occurred while deleting the customer account.');
+        console.error('Customer account delete error:', error);
+      }
+    });
+
+    
+    
+
+    
+
   }
 
   // --- Adres Yönetimi ---

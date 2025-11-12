@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface Account {
+  id: string;
   accountNumber: string;
   accountName: string;
   accountType: string;

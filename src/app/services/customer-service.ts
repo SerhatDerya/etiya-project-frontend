@@ -128,4 +128,14 @@ export class CustomerService {
     });
   }
 
+  deleteBillingAccount(id: string) {
+    const url = `http://localhost:8091/customerservice/api/billing-accounts/${id}`;
+    const token = localStorage.getItem('token');
+    return this.httpClient.delete(url, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+  }
+
 }
