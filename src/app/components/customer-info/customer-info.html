@@ -226,41 +226,250 @@
 
       @if (currentStep === 2) {
         <div class="space-y-6">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-semibold text-gray-800">Customer Accounts</h3>
-            <button
-              type="button"
-              (click)="createNewAccount()"
-              class="px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Create New Account
-            </button>
-          </div>
+          
+          @if (isCreatingAccount) {
+            <div class="p-6 bg-blue-50 border border-blue-200 rounded-lg shadow-md">
+              <h3 class="text-xl font-semibold text-blue-800 mb-4">Create New Billing Account</h3>
+              
+              <div [formGroup]="newAccountForm" class="grid grid-cols-1 gap-6 mb-6">
+                <div>
+                  <label for="accountName" class="block text-sm font-medium text-gray-700">Account Name *</label>
+                  <input id="accountName" type="text" formControlName="accountName" 
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500">
+                  @if (newAccountForm.get('accountName')?.invalid && newAccountForm.get('accountName')?.touched) {
+                    <p class="mt-1 text-xs text-red-600">Account Name is required.</p>
+                  }
+                </div>
 
-          <div class="grid grid-cols-[auto_repeat(4,minmax(0,1fr))_auto] bg-gray-100 border border-gray-300 rounded-md text-gray-700 font-semibold text-sm py-2 pl-3 pr-4">
-            <div class="px-1"></div> <div class="text-center">Account Status</div>
-            <div class="text-center">Account Number</div>
-            <div class="text-center">Account Name</div>
-            <div class="text-center">Account Type</div>
-            <div class="text-center">Action</div> </div>
+                <div>
+                  <label for="accountDescription" class="block text-sm font-medium text-gray-700">Account Description *</label>
+                  <textarea id="accountDescription" formControlName="description" rows="3"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                  @if (newAccountForm.get('description')?.invalid && newAccountForm.get('description')?.touched) {
+                    <p class="mt-1 text-xs text-red-600">Account Description is required.</p>
+                  }
+                </div>
+              </div>
 
-          <div class="space-y-2">
-            @for (account of billingAccounts; track account.id) {
-              <app-account-item
-                [account]="{
-                  id: account.id,
-                  accountNumber: account.accountNumber,
-                  accountName: account.accountName,
-                  accountType: account.typeName,
-                  status: account.statusName
-                }"
-                [isOpen]="openedAccount === account.accountNumber"
-                (toggle)="toggleAccount($event)"
-                (edit)="editAccount($event)"
-                (delete)="deleteAccount($event)"
-              />
-            }
-          </div>
+              <div class="mb-6">
+                <h4 class="text-md font-semibold text-gray-700 mb-3">Select Billing Address *</h4>
+                
+                @if (isAddingAddressInAccountCreation) {
+                  <!-- Yeni Adres Ekleme Formu -->
+                  <div [formGroup]="newAddressForm" class="p-6 bg-green-50 border border-green-200 rounded-lg shadow-md mb-4">
+                    <h3 class="text-xl font-semibold text-green-800 mb-4">Add New Address</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div>
+                        <label for="newAddressTitle" class="block text-sm font-medium text-gray-700">Address Title</label>
+                        <input id="newAddressTitle" type="text" formControlName="title" 
+                              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-green-500 focus:border-green-500">
+                        @if (newAddressForm.get('title')?.invalid && newAddressForm.get('title')?.touched) {
+                          <p class="mt-1 text-xs text-red-600">Address Title is required.</p>
+                        }
+                      </div>
+                      
+                      <div>
+                        <label for="newAddressCity" class="block text-sm font-medium text-gray-700">City</label>
+                        <select id="newAddressCity" formControlName="cityId" 
+                              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-green-500 focus:border-green-500">
+                          <option value="" disabled>Please Select a City</option>
+                          @for (city of cityList; track city.id) {
+                            <option [value]="city.id">{{ city.name }}</option>
+                          }
+                        </select>
+                        @if (newAddressForm.get('cityId')?.invalid && newAddressForm.get('cityId')?.touched) {
+                          <p class="mt-1 text-xs text-red-600">City is required.</p>
+                        }
+                      </div>
+                      
+                      <div>
+                        <label for="newAddressStreet" class="block text-sm font-medium text-gray-700">Street</label>
+                        <input id="newAddressStreet" type="text" formControlName="street" 
+                              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-green-500 focus:border-green-500">
+                        @if (newAddressForm.get('street')?.invalid && newAddressForm.get('street')?.touched) {
+                          <p class="mt-1 text-xs text-red-600">Street is required.</p>
+                        }
+                      </div>
+                      
+                      <div>
+                        <label for="newAddressHouseNumber" class="block text-sm font-medium text-gray-700">House/Flat Number</label>
+                        <input id="newAddressHouseNumber" type="text" formControlName="houseNumber" 
+                              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-green-500 focus:border-green-500">
+                        @if (newAddressForm.get('houseNumber')?.invalid && newAddressForm.get('houseNumber')?.touched) {
+                          <p class="mt-1 text-xs text-red-600">House/Flat Number is required.</p>
+                        }
+                      </div>
+
+                      <div class="md:col-span-2">
+                        <label for="newAddressDescription" class="block text-sm font-medium text-gray-700">Address Description</label>
+                        <textarea id="newAddressDescription" formControlName="description" rows="2"
+                                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-green-500 focus:border-green-500"></textarea>
+                        @if (newAddressForm.get('description')?.invalid && newAddressForm.get('description')?.touched) {
+                          <p class="mt-1 text-xs text-red-600">Address Description is required.</p>
+                        }
+                      </div>
+
+                      <div class="flex items-center pt-3 md:col-span-3">
+                        <input id="newAddressIsDefault" type="checkbox" formControlName="isDefault"
+                              class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                        <label for="newAddressIsDefault" class="ml-2 block text-sm font-medium text-gray-700">
+                          Set as Primary Address
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="pt-5 border-t mt-6 flex justify-end space-x-3">
+                      <button type="button" (click)="cancelNewAddressInAccountCreation()" 
+                              class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        Cancel
+                      </button>
+                      <button type="button" (click)="saveNewAddressInAccountCreation()"
+                              [disabled]="newAddressForm.invalid"
+                              class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                } @else {
+                  @if (addressList.length === 0) {
+                    <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-800 mb-4">
+                      No addresses available. Please add an address first.
+                    </div>
+                  } @else {
+                    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4">
+                      <div class="flex items-center justify-center">
+                        @if (shouldShowPrevAccountArrow()) {
+                          <button type="button" (click)="prevAccountAddressPage()" class="p-2 mr-2 rounded-full hover:bg-gray-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                        }
+
+                        <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
+                          @for (address of getDisplayedAccountAddresses(); track address.id) {
+                            <div class="border border-gray-300 rounded-md p-3 hover:bg-gray-50 cursor-pointer"
+                                [class.bg-blue-50]="selectedAddressForAccount === address.id"
+                                [class.border-blue-500]="selectedAddressForAccount === address.id"
+                                (click)="selectAddressForAccount(address.id)">
+                              <div class="flex items-start">
+                                <input 
+                                  type="radio" 
+                                  [id]="'account-address-' + address.id"
+                                  [name]="'accountAddress'"
+                                  [checked]="selectedAddressForAccount === address.id"
+                                  class="h-4 w-4 mt-1 mr-3 cursor-pointer"
+                                  [style.accent-color]="'#3b82f6'"
+                                />
+                                <div class="flex-grow">
+                                  <div class="flex justify-between items-start">
+                                    <h5 class="font-semibold text-gray-900">{{ address.title }}</h5>
+                                    @if (address.isDefault) {
+                                      <span class="text-xs font-medium text-green-700 bg-green-100 px-2 py-1 rounded-full">Primary</span>
+                                    }
+                                  </div>
+                                  <div class="mt-2 text-sm text-gray-600 space-y-1">
+                                    <p><span class="font-medium">City:</span> {{ address.cityName }}</p>
+                                    <p><span class="font-medium">Street:</span> {{ address.street }}</p>
+                                    <p><span class="font-medium">House No:</span> {{ address.houseNumber }}</p>
+                                    <p><span class="font-medium">Description:</span> {{ address.description }}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          }
+                          @if (getDisplayedAccountAddresses().length === 1 && accountAddressesPerPage === 2) {
+                            <div></div>
+                          }
+                        </div>
+
+                        @if (shouldShowNextAccountArrow()) {
+                          <button type="button" (click)="nextAccountAddressPage()" class="p-2 ml-2 rounded-full hover:bg-gray-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        }
+                      </div>
+
+                      @if (totalAccountAddressPages > 1) {
+                        <div class="mt-4 text-center text-sm text-gray-600">
+                          Page {{ currentAccountAddressPage }} / {{ totalAccountAddressPages }}
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <!-- Add New Address Button -->
+                  <div class="flex justify-center">
+                    <button type="button" (click)="addNewAddressInAccountCreation()" 
+                            class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                      </svg>
+                      Add New Address
+                    </button>
+                  </div>
+                }
+              </div>
+
+              <div class="pt-5 border-t flex justify-end space-x-3">
+                <button type="button" (click)="cancelNewAccount()" 
+                        class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  Cancel
+                </button>
+                <button type="button" (click)="saveNewAccount()"
+                        [disabled]="newAccountForm.invalid || !selectedAddressForAccount || isAddingAddressInAccountCreation"
+                        class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                  Create
+                </button>
+              </div>
+            </div>
+          } @else {
+              <!-- Customer Accounts List -->
+              @if (billingAccounts.length === 0) {
+                <div class="flex flex-col items-center justify-center min-h-[200px] border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50">
+                  <span class="text-lg font-medium text-gray-500 mb-4">No Billing Accounts Found.</span>
+                  <button type="button" (click)="createNewAccount()" 
+                          class="px-8 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Create New Account
+                  </button>
+                </div>
+              } @else {
+                <div class="flex justify-between items-center mb-4">
+                  <span class="text-lg font-semibold text-gray-700">Billing Accounts</span>
+                  <button type="button" (click)="createNewAccount()" 
+                          class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Create New Account
+                  </button>
+                </div>
+
+                <div class="space-y-3">
+                  @for (account of billingAccounts; track account.accountNumber) {
+                    <app-account-item
+                      [account]="{
+                        id: account.id,
+                        accountNumber: account.accountNumber,
+                        accountName: account.accountName,
+                        accountType: account.typeName,
+                        status: account.statusName
+                      }"
+                      [isOpen]="openedAccount === account.accountNumber"
+                      (toggle)="toggleAccount($event)"
+                      (edit)="editAccount($event)"
+                      (delete)="deleteAccount($event)">
+                    </app-account-item>
+                  }
+                </div>
+              }
+          }
         </div>
       }
 

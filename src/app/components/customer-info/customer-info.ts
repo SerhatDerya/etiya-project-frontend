@@ -9,6 +9,7 @@ import { BillingAccountSearch } from '../../models/customerListResponse';
 import { UpdateCustomerRequest } from '../../models/updateCustomerRequest';
 import { CreateAddressRequest } from '../../models/createAddressRequest';
 import { CreateContactMediumsRequest } from '../../models/createContactMediumsRequest';
+import { CreateBillingAccountRequest } from '../../models/createBillingAccountRequest';
 
 // HTML Template dosyası aşağıda
 
@@ -73,8 +74,18 @@ export class CustomerInfo implements OnInit {
   newAddressForm!: FormGroup;
   editAddressForm!: FormGroup;
 
+  // Billing Account yönetimi
+  isCreatingAccount: boolean = false;
+  newAccountForm!: FormGroup;
+  selectedAddressForAccount: string = '';
+  isAddingAddressInAccountCreation: boolean = false;
+
   currentAddressPage = 1;
   addressesPerPage = 2;
+
+  // Account oluşturma sırasında adres sayfalama için yeni değişkenler
+  currentAccountAddressPage = 1;
+  accountAddressesPerPage = 2;
 
   openedAccount: string | null = null;
 
@@ -151,6 +162,12 @@ export class CustomerInfo implements OnInit {
       houseNumber: ['', Validators.required],
       description: ['', Validators.required],
       isDefault: [false]
+    });
+
+    // Yeni Account Formu
+    this.newAccountForm = this.fb.group({
+      accountName: ['', Validators.required],
+      description: ['', Validators.required]
     });
   }
 
@@ -282,8 +299,71 @@ export class CustomerInfo implements OnInit {
   }
 
   createNewAccount(): void {
-    alert('Create New Account tıklandı (işlev eklenecek).');
+    this.isCreatingAccount = true;
+    this.selectedAddressForAccount = this.addressList.find(a => a.isDefault)?.id || '';
+    this.newAccountForm.reset();
+    this.newAccountForm.markAsUntouched();
   }
+
+  cancelNewAccount(): void {
+    this.isCreatingAccount = false;
+    this.selectedAddressForAccount = '';
+    this.newAccountForm.reset();
+  }
+
+  selectAddressForAccount(addressId: string): void {
+    this.selectedAddressForAccount = addressId;
+  }
+
+  saveNewAccount(): void {
+  if (this.newAccountForm.valid && this.selectedAddressForAccount) {
+    const createAccountRequest: CreateBillingAccountRequest = {
+      customerId: this.customerId,
+      addressId: this.selectedAddressForAccount,
+      accountName: this.newAccountForm.value.accountName
+    };
+
+    this.customerService.createBillingAccount(createAccountRequest).subscribe({
+      next: (response: any) => {
+        // Yeni account'u listeye ekle
+        const newAccount: BillingAccountSearch = {
+          id: response.id || response.data?.id || '',
+          customerId: response.customerId,
+          addressId: response.addressId,
+          statusId: response.statusId || '',
+          typeId: response.typeId || '',
+          accountNumber: response.accountNumber || '',
+          accountName: this.newAccountForm.value.accountName,
+          statusName: response.statusName || 'ACTIVE',
+          typeName: response.typeName || 'BILLING'
+        };
+
+        this.billingAccounts.push(newAccount);
+        
+        this.modalMessage = 'Billing account created successfully';
+        this.showSuccessModal = true;
+        this.cd.detectChanges();
+
+        setTimeout(() => {
+          this.showSuccessModal = false;
+          this.modalMessage = '';
+          this.cancelNewAccount();
+          this.cd.detectChanges();
+        }, 2000);
+      },
+      error: (error) => {
+        this.modalMessage = error.error?.detail || error.error?.message || error.message || 'An error occurred while creating billing account.';
+        this.showErrorModal = true;
+        console.error('Billing account create error:', error);
+      }
+    });
+  } else {
+    if (!this.selectedAddressForAccount) {
+      alert('Please select an address for the billing account.');
+    }
+    this.newAccountForm.markAllAsTouched();
+  }
+}
 
   editAccount(account: Account): void {
     alert(`Edit account: ${account.accountName}`);
@@ -679,6 +759,107 @@ export class CustomerInfo implements OnInit {
 
   shouldShowPrevArrow(): boolean {
     return this.addressList.length > this.addressesPerPage && this.currentAddressPage > 1;
+  }
+
+  // Account oluşturma sırasında adres sayfalama
+  getDisplayedAccountAddresses(): Address[] {
+    const startIndex = (this.currentAccountAddressPage - 1) * this.accountAddressesPerPage;
+    const endIndex = startIndex + this.accountAddressesPerPage;
+    return this.addressList.slice(startIndex, endIndex);
+  }
+
+  nextAccountAddressPage(): void {
+    const totalPages = Math.ceil(this.addressList.length / this.accountAddressesPerPage);
+    if (this.currentAccountAddressPage < totalPages) {
+      this.currentAccountAddressPage++;
+    }
+  }
+
+  prevAccountAddressPage(): void {
+    if (this.currentAccountAddressPage > 1) {
+      this.currentAccountAddressPage--;
+    }
+  }
+
+  get totalAccountAddressPages(): number {
+    return Math.ceil(this.addressList.length / this.accountAddressesPerPage);
+  }
+
+  shouldShowNextAccountArrow(): boolean {
+    return this.addressList.length > this.accountAddressesPerPage && this.currentAccountAddressPage < this.totalAccountAddressPages;
+  }
+
+  shouldShowPrevAccountArrow(): boolean {
+    return this.addressList.length > this.accountAddressesPerPage && this.currentAccountAddressPage > 1;
+  }
+
+  // Account oluşturma sırasında yeni adres ekleme
+  addNewAddressInAccountCreation(): void {
+    this.isAddingAddressInAccountCreation = true;
+    this.newAddressForm.reset({ cityId: '', isDefault: this.addressList.length === 0 });
+    this.newAddressForm.markAsUntouched();
+  }
+
+  cancelNewAddressInAccountCreation(): void {
+    this.isAddingAddressInAccountCreation = false;
+    this.newAddressForm.reset();
+  }
+
+  saveNewAddressInAccountCreation(): void {
+    if (this.newAddressForm.valid) {
+      let isDefault = this.newAddressForm.value.isDefault;
+
+      if (this.addressList.length === 0) {
+        isDefault = true;
+      }
+
+      const selectedCity = this.cityList.find(c => c.id.toString() === this.newAddressForm.value.cityId);
+
+      const createAddressRequest: CreateAddressRequest = {
+        title: this.newAddressForm.value.title,
+        street: this.newAddressForm.value.street,
+        houseNumber: this.newAddressForm.value.houseNumber,
+        description: this.newAddressForm.value.description,
+        isDefault: isDefault,
+        customerId: this.customerId,
+        cityId: parseInt(this.newAddressForm.value.cityId)
+      };
+
+      this.customerService.createAddress(createAddressRequest).subscribe({
+        next: (response: any) => {
+          const newAddress: Address = {
+            index: this.addressList.length > 0 ? Math.max(...this.addressList.map(a => a.index)) + 1 : 1,
+            id: response.id || response.data?.id || '',
+            title: this.newAddressForm.value.title,
+            cityName: selectedCity ? selectedCity.name : 'Bilinmeyen Şehir',
+            cityId: parseInt(this.newAddressForm.value.cityId),
+            street: this.newAddressForm.value.street,
+            houseNumber: this.newAddressForm.value.houseNumber,
+            description: this.newAddressForm.value.description,
+            isDefault: isDefault
+          };
+
+          if (newAddress.isDefault) {
+            this.addressList.forEach(addr => addr.isDefault = false);
+          }
+
+          this.addressList.push(newAddress);
+          this.selectedAddressForAccount = newAddress.id;
+          this.isAddingAddressInAccountCreation = false;
+          this.currentAccountAddressPage = this.totalAccountAddressPages;
+          this.newAddressForm.reset();
+          this.cd.detectChanges();
+        },
+        error: (error) => {
+          this.modalMessage = error.error?.detail || error.error?.message || error.message || 'An error occurred while adding the address.';
+          this.showErrorModal = true;
+          console.error('Address add error:', error);
+        }
+      });
+
+    } else {
+      this.newAddressForm.markAllAsTouched();
+    }
   }
 
   // --- Diğer Form Kontrol Metotları ---

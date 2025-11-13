@@ -7,6 +7,7 @@ import { CreateAddressRequest } from '../models/createAddressRequest';
 import { CreateCustomerResponse } from '../models/createCustomerResponse';
 import { BillingAccountListResponse } from '../models/billingAccountListResponse';
 import { UpdateCustomerRequest } from '../models/updateCustomerRequest';
+import { CreateBillingAccountRequest } from '../models/createBillingAccountRequest';
 
 @Injectable({
   providedIn: 'root'
@@ -122,6 +123,16 @@ export class CustomerService {
     const url = `http://localhost:8091/customerservice/api/billing-accounts/`;
     const token = localStorage.getItem('token');
     return this.httpClient.get<BillingAccountListResponse>(url, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+  }
+
+  createBillingAccount(request: CreateBillingAccountRequest) {
+    const url = 'http://localhost:8091/customerservice/api/billing-accounts/';
+    const token = localStorage.getItem('token');
+    return this.httpClient.post<CreateBillingAccountRequest>(url, request, {
       headers: {
         Authorization: 'Bearer ' + token
       }
