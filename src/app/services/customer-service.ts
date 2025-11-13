@@ -139,6 +139,16 @@ export class CustomerService {
     });
   }
 
+  updateBillingAccount(id: string, request: CreateBillingAccountRequest) {
+    const url = `http://localhost:8091/customerservice/api/billing-accounts/${id}`;
+    const token = localStorage.getItem('token');
+    return this.httpClient.put<CreateBillingAccountRequest>(url, request, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+  }
+
   deleteBillingAccount(id: string) {
     const url = `http://localhost:8091/customerservice/api/billing-accounts/${id}`;
     const token = localStorage.getItem('token');

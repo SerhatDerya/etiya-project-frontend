@@ -76,6 +76,8 @@ export class CustomerInfo implements OnInit {
 
   // Billing Account yönetimi
   isCreatingAccount: boolean = false;
+  isEditingAccount: boolean = false; // YENİ
+  editingAccountId: string | null = null; // YENİ
   newAccountForm!: FormGroup;
   selectedAddressForAccount: string = '';
   isAddingAddressInAccountCreation: boolean = false;
@@ -366,7 +368,72 @@ export class CustomerInfo implements OnInit {
 }
 
   editAccount(account: Account): void {
-    alert(`Edit account: ${account.accountName}`);
+    this.isEditingAccount = true;
+    this.isCreatingAccount = false;
+    this.editingAccountId = account.id;
+    
+    // Form'u mevcut account verileriyle doldur
+    const currentAccount = this.billingAccounts.find(acc => acc.id === account.id);
+    if (currentAccount) {
+      this.newAccountForm.setValue({
+        accountName: currentAccount.accountName,
+        description: '' // API'den description gelmiyor, boş bırakabilirsiniz veya API'yi güncelleyin
+      });
+      this.selectedAddressForAccount = currentAccount.addressId;
+      this.newAccountForm.markAsUntouched();
+    }
+  }
+
+  cancelEditAccount(): void {
+    this.isEditingAccount = false;
+    this.editingAccountId = null;
+    this.selectedAddressForAccount = '';
+    this.newAccountForm.reset();
+  }
+
+  saveEditedAccount(): void {
+    if (this.newAccountForm.valid && this.selectedAddressForAccount && this.editingAccountId) {
+      const updateAccountRequest: CreateBillingAccountRequest = {
+        customerId: this.customerId,
+        addressId: this.selectedAddressForAccount,
+        accountName: this.newAccountForm.value.accountName
+      };
+
+      this.customerService.updateBillingAccount(this.editingAccountId, updateAccountRequest).subscribe({
+        next: (response: any) => {
+          // Local state'i güncelle
+          const index = this.billingAccounts.findIndex(acc => acc.id === this.editingAccountId);
+          if (index !== -1) {
+            this.billingAccounts[index] = {
+              ...this.billingAccounts[index],
+              accountName: this.newAccountForm.value.accountName,
+              addressId: this.selectedAddressForAccount
+            };
+          }
+
+          this.modalMessage = 'Billing account updated successfully';
+          this.showSuccessModal = true;
+          this.cd.detectChanges();
+
+          setTimeout(() => {
+            this.showSuccessModal = false;
+            this.modalMessage = '';
+            this.cancelEditAccount();
+            this.cd.detectChanges();
+          }, 2000);
+        },
+        error: (error) => {
+          this.modalMessage = error.error?.detail || error.error?.message || error.message || 'An error occurred while updating billing account.';
+          this.showErrorModal = true;
+          console.error('Billing account update error:', error);
+        }
+      });
+    } else {
+      if (!this.selectedAddressForAccount) {
+        alert('Please select an address for the billing account.');
+      }
+      this.newAccountForm.markAllAsTouched();
+    }
   }
 
   deleteAccount(account: Account): void {
