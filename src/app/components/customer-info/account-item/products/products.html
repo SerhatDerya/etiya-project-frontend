@@ -57,29 +57,29 @@
     </div>
     <!-- Buttons Section -->
     <div class="flex flex-col gap-2 min-w-[180px]">
-    <button
+      <button
         type="button"
         class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
         (click)="onStartNewSale($event)"
-    >
+      >
         Start New Sale
-    </button>
-    
-    <button
+      </button>
+      
+      <button
         type="button"
         class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
         (click)="onTransfer($event)"
-    >
+      >
         Transfer
-    </button>
-    
-    <button
+      </button>
+      
+      <button
         type="button"
         class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
         (click)="onServiceAddressChange($event)"
-    >
+      >
         Service Address Change
-    </button>
+      </button>
     </div>
   </div>
 </div>
@@ -87,15 +87,12 @@
 <!-- Product Detail Modal -->
 @if (selectedProduct) {
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-    <!-- Backdrop -->
     <div 
       class="absolute inset-0 bg-black/50 backdrop-blur-sm"
       (click)="closeProductDetail()"
     ></div>
     
-    <!-- Modal Content -->
     <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto z-10">
-      <!-- Header -->
       <div class="flex items-center justify-between p-6 border-b border-gray-200">
         <h2 class="text-2xl font-bold text-gray-800">Product Details</h2>
         <button
@@ -110,10 +107,8 @@
         </button>
       </div>
       
-      <!-- Body -->
       <div class="p-6">
         <div class="grid grid-cols-3 gap-6">
-          <!-- First Row -->
           <div>
             <label class="text-sm font-semibold text-gray-600">Product Offer ID</label>
             <p class="text-gray-800 mt-1">{{ selectedProduct.id }}</p>
@@ -129,7 +124,6 @@
             <p class="text-gray-800 mt-1">{{ selectedProduct.campaignId }}</p>
           </div>
           
-          <!-- Second Row -->
           <div>
             <label class="text-sm font-semibold text-gray-600">Service Start Date</label>
             <p class="text-gray-800 mt-1">2024-01-15</p>
@@ -143,9 +137,475 @@
           <div>
             <label class="text-sm font-semibold text-gray-600">Address</label>
             <p class="text-gray-800 mt-1">Home, Baker Street, London</p>
-            <p>Address Description</p>
+            <p class="text-gray-600 text-sm">Address Description</p>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Offer Selection Modal -->
+@if (showOfferSelection) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    
+    <div class="relative bg-white rounded-lg shadow-xl w-full max-w-7xl max-h-[90vh] overflow-y-auto z-10">
+      <div class="flex items-center justify-between p-6 border-b border-gray-200">
+        <h2 class="text-2xl font-bold text-gray-800">Offer Selection</h2>
+        <button
+          type="button"
+          class="text-gray-400 hover:text-gray-600 transition-colors"
+          (click)="closeOfferSelection()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div class="p-6">
+        <div class="grid grid-cols-3 gap-6">
+          <div class="col-span-2 space-y-4">
+            <div class="border-b border-gray-200">
+              <nav class="flex space-x-4">
+                <button
+                  type="button"
+                  class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+                  [class.border-orange-500]="activeTab === 'catalog'"
+                  [class.text-orange-600]="activeTab === 'catalog'"
+                  [class.border-transparent]="activeTab !== 'catalog'"
+                  [class.text-gray-500]="activeTab !== 'catalog'"
+                  (click)="activeTab = 'catalog'"
+                >
+                  Catalog
+                </button>
+                <button
+                  type="button"
+                  class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+                  [class.border-orange-500]="activeTab === 'campaign'"
+                  [class.text-orange-600]="activeTab === 'campaign'"
+                  [class.border-transparent]="activeTab !== 'campaign'"
+                  [class.text-gray-500]="activeTab !== 'campaign'"
+                  (click)="activeTab = 'campaign'"
+                >
+                  Campaign
+                </button>
+              </nav>
+            </div>
+
+            @if (activeTab === 'catalog') {
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">Catalog Selection</label>
+                  <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                    <option value="">Select Catalog</option>
+                    <option value="1">Catalog 1</option>
+                    <option value="2">Catalog 2</option>
+                  </select>
+                </div>
+
+                <div class="flex gap-3 items-end">
+                  <div class="flex-1">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Prod Offer ID</label>
+                    <input 
+                      type="text" 
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      placeholder="Enter Prod Offer ID"
+                    />
+                  </div>
+                  <div class="flex-1">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Prod Offer Name</label>
+                    <input 
+                      type="text" 
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      placeholder="Enter Prod Offer Name"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    class="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors"
+                  >
+                    Search
+                  </button>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                  <table class="min-w-full bg-white">
+                    <thead class="bg-gray-100">
+                      <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Prod Offer ID</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Prod Offer Name</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                      @for (offer of mockCatalogOffers; track offer.id) {
+                        <tr 
+                          class="hover:bg-gray-50 transition-colors cursor-pointer"
+                          [class.bg-orange-50]="selectedOffer?.id === offer.id"
+                          (click)="selectOffer(offer)"
+                        >
+                          <td class="px-4 py-3 text-sm text-gray-800">{{ offer.id }}</td>
+                          <td class="px-4 py-3 text-sm text-gray-800">{{ offer.name }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+
+            @if (activeTab === 'campaign') {
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">Campaign Selection</label>
+                  <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                    <option value="">Select Campaign</option>
+                    <option value="1">Campaign 1</option>
+                    <option value="2">Campaign 2</option>
+                  </select>
+                </div>
+
+                <div class="flex gap-3 items-end">
+                  <div class="flex-1">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Campaign ID</label>
+                    <input 
+                      type="text" 
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      placeholder="Enter Campaign ID"
+                    />
+                  </div>
+                  <div class="flex-1">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Campaign Name</label>
+                    <input 
+                      type="text" 
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      placeholder="Enter Campaign Name"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    class="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors"
+                  >
+                    Search
+                  </button>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                  <table class="min-w-full bg-white">
+                    <thead class="bg-gray-100">
+                      <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Campaign ID</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Prod Offer ID</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Prod Offer Name</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                      @for (offer of mockCampaignOffers; track offer.id) {
+                        <tr 
+                          class="hover:bg-gray-50 transition-colors cursor-pointer"
+                          [class.bg-orange-50]="selectedOffer?.id === offer.id"
+                          (click)="selectOffer(offer)"
+                        >
+                          <td class="px-4 py-3 text-sm text-gray-800">{{ offer.campaignId }}</td>
+                          <td class="px-4 py-3 text-sm text-gray-800">{{ offer.id }}</td>
+                          <td class="px-4 py-3 text-sm text-gray-800">{{ offer.name }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+
+            <div class="flex justify-center pt-4">
+              <button
+                type="button"
+                class="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                [disabled]="!selectedOffer"
+                (click)="addToBasket()"
+              >
+                Add to Basket
+              </button>
+            </div>
+          </div>
+
+          <div class="col-span-1 border-l border-gray-200 pl-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-bold text-gray-800">Basket</h3>
+              <button
+                type="button"
+                class="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded font-medium transition-colors"
+                (click)="clearBasket()"
+              >
+                Clear
+              </button>
+            </div>
+
+            <div class="space-y-2">
+              @for (item of basket; track item.id) {
+                <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <div class="text-sm font-semibold text-gray-800">{{ item.name }}</div>
+                  <div class="text-xs text-gray-600">ID: {{ item.id }}</div>
+                </div>
+              } @empty {
+                <div class="text-center text-gray-500 py-8">
+                  <p class="text-sm">Basket is empty</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
+        <button
+          type="button"
+          class="px-6 py-2 rounded-lg font-medium transition-colors"
+          [class.bg-orange-500]="basket.length > 0"
+          [class.hover:bg-orange-600]="basket.length > 0"
+          [class.text-white]="basket.length > 0"
+          [class.bg-gray-300]="basket.length === 0"
+          [class.text-gray-500]="basket.length === 0"
+          [class.cursor-not-allowed]="basket.length === 0"
+          [disabled]="basket.length === 0"
+          (click)="proceedToConfiguration()"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Configuration Product Modal -->
+@if (showConfiguration) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    
+    <div class="relative bg-white rounded-lg shadow-xl w-full max-w-7xl max-h-[90vh] overflow-y-auto z-10">
+      <div class="flex items-center justify-between p-6 border-b border-gray-200">
+        <h2 class="text-2xl font-bold text-gray-800">Configuration Product</h2>
+        <button
+          type="button"
+          class="text-gray-400 hover:text-gray-600 transition-colors"
+          (click)="closeConfiguration()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div class="p-6 space-y-6">
+        <!-- Products Configuration -->
+        @for (product of basket; track product.id) {
+          <div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+            <div class="mb-4">
+              <h3 class="text-lg font-semibold text-gray-800">{{ product.name }}</h3>
+              <p class="text-sm text-gray-600">Product Offer ID: {{ product.id }}</p>
+            </div>
+            
+            <div [formGroup]="productForms[product.id]" class="grid grid-cols-3 gap-4">
+              @for (char of getProductCharacteristics(product.id); track char) {
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">{{ char }}</label>
+                  <input 
+                    type="text" 
+                    [formControlName]="char"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                    placeholder="Enter {{ char }}"
+                  />
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Address Selection -->
+        <div class="border-t border-gray-200 pt-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Select Service Address</h3>
+          
+          <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <div class="flex items-center justify-center">
+              @if (shouldShowPrevConfigArrow()) {
+                <button type="button" (click)="prevConfigAddressPage()" class="p-2 mr-2 rounded-full hover:bg-gray-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+              }
+
+              <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
+                @for (address of getDisplayedConfigAddresses(); track address.id) {
+                  <div 
+                    class="border border-gray-300 rounded-md p-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                    [class.bg-orange-50]="selectedConfigAddress === address.id"
+                    [class.border-orange-500]="selectedConfigAddress === address.id"
+                    (click)="selectConfigAddress(address.id)"
+                  >
+                    <div class="flex items-start">
+                      <input 
+                        type="radio" 
+                        [id]="'config-address-' + address.id"
+                        [name]="'configAddress'"
+                        [checked]="selectedConfigAddress === address.id"
+                        class="h-4 w-4 mt-0.5 mr-2 cursor-pointer"
+                        [style.accent-color]="'#f97316'"
+                      />
+                      <div class="flex-grow">
+                        <div class="flex justify-between items-start">
+                          <h5 class="font-semibold text-gray-900 text-sm">{{ address.title }}</h5>
+                          @if (address.isDefault) {
+                            <span class="text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Primary</span>
+                          }
+                        </div>
+                        <div class="mt-1 text-xs text-gray-600 space-y-0.5">
+                          <p><span class="font-medium">City:</span> {{ address.cityName }}</p>
+                          <p><span class="font-medium">Street:</span> {{ address.street }}</p>
+                          <p><span class="font-medium">House No:</span> {{ address.houseNumber }}</p>
+                          <p><span class="font-medium">Description:</span> {{ address.description }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+                @if (getDisplayedConfigAddresses().length === 1 && configAddressesPerPage === 2) {
+                  <div></div>
+                }
+              </div>
+
+              @if (shouldShowNextConfigArrow()) {
+                <button type="button" (click)="nextConfigAddressPage()" class="p-2 ml-2 rounded-full hover:bg-gray-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              }
+            </div>
+
+            @if (totalConfigAddressPages > 1) {
+              <div class="mt-3 text-center text-sm text-gray-600">
+                Page {{ currentConfigAddressPage }} / {{ totalConfigAddressPages }}
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between p-6 border-t border-gray-200">
+        <button
+          type="button"
+          class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+          (click)="goBackToOfferSelection()"
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          class="px-6 py-2 rounded-lg font-medium transition-colors"
+          [class.bg-orange-500]="isConfigurationComplete()"
+          [class.hover:bg-orange-600]="isConfigurationComplete()"
+          [class.text-white]="isConfigurationComplete()"
+          [class.bg-gray-300]="!isConfigurationComplete()"
+          [class.text-gray-500]="!isConfigurationComplete()"
+          [class.cursor-not-allowed]="!isConfigurationComplete()"
+          [disabled]="!isConfigurationComplete()"
+          (click)="proceedToSubmitOrder()"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Submit Order Modal -->
+@if (showSubmitOrder) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    
+    <div class="relative bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto z-10">
+      <div class="flex items-center justify-between p-6 border-b border-gray-200">
+        <h2 class="text-2xl font-bold text-gray-800">Submit Order</h2>
+        <button
+          type="button"
+          class="text-gray-400 hover:text-gray-600 transition-colors"
+          (click)="closeSubmitOrder()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div class="p-6 space-y-6">
+        <!-- Order ID -->
+        <div class="border-b border-gray-200 pb-4">
+          <label class="text-sm font-semibold text-gray-600">Order ID</label>
+          <p class="text-lg font-bold text-gray-800 mt-1">{{ orderId }}</p>
+        </div>
+
+        <!-- Order Items -->
+        <div class="border-b border-gray-200 pb-4">
+          <h3 class="text-sm font-semibold text-gray-600 mb-3">Order Items</h3>
+          <div class="space-y-2">
+            @for (item of basket; track item.id) {
+              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p class="font-medium text-gray-800">{{ item.name }}</p>
+                  <p class="text-sm text-gray-600">ID: {{ item.id }}</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-bold text-gray-800">${{ item.price?.toFixed(2) || '0.00' }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Service Address -->
+        <div class="border-b border-gray-200 pb-4">
+          <h3 class="text-sm font-semibold text-gray-600 mb-3">Service Address</h3>
+          @if (getSelectedAddress()) {
+            <div class="p-3 bg-gray-50 rounded-lg">
+              <p class="font-medium text-gray-800">{{ getSelectedAddress().title }}</p>
+              <p class="text-sm text-gray-600 mt-1">
+                {{ getSelectedAddress().cityName }}, {{ getSelectedAddress().street }}, 
+                {{ getSelectedAddress().houseNumber }}
+              </p>
+              <p class="text-sm text-gray-500 mt-1">{{ getSelectedAddress().description }}</p>
+            </div>
+          }
+        </div>
+
+        <!-- Total Amount -->
+        <div class="bg-orange-50 p-4 rounded-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-lg font-semibold text-gray-800">Total Amount</span>
+            <span class="text-2xl font-bold text-orange-600">${{ getTotalAmount().toFixed(2) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between p-6 border-t border-gray-200">
+        <button
+          type="button"
+          class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+          (click)="goBackToConfiguration()"
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          class="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors"
+          (click)="submitOrder()"
+        >
+          Submit
+        </button>
       </div>
     </div>
   </div>
