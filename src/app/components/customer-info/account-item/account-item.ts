@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Products } from './products/products';
 
 export interface Account {
   id: string;
@@ -12,7 +13,7 @@ export interface Account {
 @Component({
   selector: 'app-account-item',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Products],
   templateUrl: './account-item.html',
   styleUrls: ['./account-item.scss']
 })
@@ -37,4 +38,5 @@ export class AccountItem {
     event.stopPropagation();
     this.delete.emit(this.account);
   }
+
 }

@@ -60,10 +60,8 @@
   </div>
 
   @if (isOpen) {
-    <div class="p-4 bg-gray-50 border-t border-gray-200 text-gray-600">
-      <div class="h-16 flex items-center justify-center italic text-gray-400">
-        (Account details placeholder)
-      </div>
-    </div>
+    <app-products
+      [accountId]="account.id"
+    ></app-products>
   }
 </div>
