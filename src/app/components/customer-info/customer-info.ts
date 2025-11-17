@@ -135,7 +135,7 @@ export class CustomerInfo implements OnInit {
       middleName: [''],
       birthDate: ['', Validators.required],
       fatherName: [''],
-      nationalityId: ['', [Validators.required, Validators.pattern('^[0-9]{11}$')]],
+      nationalityId: ['', [Validators.required, Validators.pattern('^\\d{10}[02468]$')]],
 
       account: this.fb.group({}),
       address: this.fb.group({}),

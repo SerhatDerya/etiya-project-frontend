@@ -183,7 +183,7 @@
                 </ng-template>
                 
                 @if (customerForm.get(controlName)?.invalid && customerForm.get(controlName)?.touched) {
-                  <p class="mt-1 text-xs text-red-600">{{ getLabel(controlName) }} zorunludur.</p>
+                  <p class="mt-1 text-xs text-red-600">{{ getLabel(controlName) }} must be 11 digits even number!</p>
                 }
 
               </ng-container>
