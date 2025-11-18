@@ -155,10 +155,26 @@ export class CreateCustomer implements OnInit {
   // ... (nextStep, prevStep, onCancel, markControlsAsTouched fonksiyonları değişmedi) ...
   nextStep() {
     if (this.currentStep === 1) {
-      const demographicInfoControls = ['firstName', 'lastName', 'gender', 'birthDate', 'nationalityId'];
+      // Tüm Step 1 alanlarını kontrol et (required olmayanlar da dahil)
+      const demographicInfoControls = [
+        'firstName', 
+        'lastName', 
+        'gender', 
+        'birthDate', 
+        'nationalityId',
+        'motherName',  // Eklendi
+        'middleName',  // Eklendi
+        'fatherName'   // Eklendi
+      ];
       this.markControlsAsTouched(demographicInfoControls);
       
-      const isStep1Valid = demographicInfoControls.every(c => this.customerForm.get(c)?.valid);
+      // Tüm alanların valid olup olmadığını kontrol et
+      const isStep1Valid = demographicInfoControls.every(c => {
+        const control = this.customerForm.get(c);
+        // Eğer alan boşsa ve required değilse valid kabul et
+        // Eğer alan doluysa validasyonlarını kontrol et
+        return !control || control.valid || (control.value === '' && !control.hasError('required'));
+      });
       
       if (isStep1Valid) {
         this.currentStep = 2;
@@ -167,7 +183,12 @@ export class CreateCustomer implements OnInit {
         console.error('Lütfen Demografik Bilgileri doğru giriniz.');
       }
     } else if (this.currentStep === 2) {
-      // Yeni adres ekleme/düzenleme modunda değilsek ilerle
+      // Adres yoksa veya yeni adres ekleme/düzenleme modunda ise ilerletme
+      if (this.addressList.length === 0) {
+        console.error('Lütfen en az bir adres ekleyin.');
+        return;
+      }
+      
       if (!this.isAddingNewAddress && !this.isEditingAddress) {
         this.currentStep = 3;
       } else {

@@ -161,7 +161,14 @@
               Cancel
             </button>
             <button type="button" (click)="nextStep()"
-                    [disabled]="customerForm.get('firstName')?.invalid || customerForm.get('lastName')?.invalid || customerForm.get('gender')?.invalid || customerForm.get('birthDate')?.invalid || customerForm.get('nationalityId')?.invalid"
+                    [disabled]="customerForm.get('firstName')?.invalid || 
+                                customerForm.get('lastName')?.invalid || 
+                                customerForm.get('gender')?.invalid || 
+                                customerForm.get('birthDate')?.invalid || 
+                                customerForm.get('nationalityId')?.invalid ||
+                                (customerForm.get('motherName')?.dirty && customerForm.get('motherName')?.invalid) ||
+                                (customerForm.get('middleName')?.dirty && customerForm.get('middleName')?.invalid) ||
+                                (customerForm.get('fatherName')?.dirty && customerForm.get('fatherName')?.invalid)"
                     class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#f58220] hover:bg-[#e76b1f] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#f58220] disabled:opacity-50 disabled:cursor-not-allowed">
               Next
             </button>
