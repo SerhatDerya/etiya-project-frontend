@@ -50,5 +50,16 @@ export class CatalogService {
       }
     });
   }
+
+  getProductById(productId: string) {
+    const url = `http://localhost:8091/catalogservice/api/products/${productId}`;
+    const token = localStorage.getItem('token');
+    console.log(`Fetching product with ID ${productId} from URL:`, url);
+    return this.httpClient.get(url, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+  }
   
 }

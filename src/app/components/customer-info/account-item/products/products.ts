@@ -5,6 +5,8 @@ import { CatalogService } from '../../../../services/catalog-service';
 import { Catalog } from '../../../../models/catalogsListResponse';
 import { ProductOffer } from '../../../../models/productOffersListResponse';
 import { Campaign } from '../../../../models/campaignsListResponse';
+import { ProductByIdResponse } from '../../../../models/productByIdResponse';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-products',
@@ -15,6 +17,7 @@ import { Campaign } from '../../../../models/campaignsListResponse';
 export class Products {
 
   @Input() accountId!: string;
+  @Input() customerAddresses: any[] = [];
 
   selectedProduct: any = null;
   showOfferSelection: boolean = false;
@@ -40,6 +43,10 @@ export class Products {
   productOffers = signal<ProductOffer[]>([]);
   allProductOffers = signal<ProductOffer[]>([]);
   loadingProductOffers = signal<boolean>(false);
+
+  // Product prices cache
+  productPrices: { [key: string]: ProductByIdResponse } = {};
+  loadingPrices = signal<boolean>(false);
 
   // Search filters - Signals ile
   searchOfferId = signal<string>('');
@@ -72,12 +79,6 @@ export class Products {
   
   // Submit Order için
   orderId: string = '';
-  
-  mockAddresses = [
-    { id: 'ADDR-001', title: 'Home', cityName: 'Istanbul', street: 'Main Street', houseNumber: '42', description: 'Primary Address', isDefault: true },
-    { id: 'ADDR-002', title: 'Office', cityName: 'Ankara', street: 'Business Ave', houseNumber: '15/3', description: 'Work Address', isDefault: false },
-    { id: 'ADDR-003', title: 'Summer House', cityName: 'Izmir', street: 'Beach Road', houseNumber: '7', description: 'Vacation Home', isDefault: false }
-  ];
 
   currentConfigAddressPage = 1;
   configAddressesPerPage = 2;
@@ -185,6 +186,7 @@ export class Products {
         this.lastLoadedCatalogId.set(catalogId);
         
         this.applySearchFilter();
+        this.loadProductPrices(response);
         
         console.log('Setting loadingProductOffers to false');
         this.loadingProductOffers.set(false);
@@ -211,6 +213,7 @@ export class Products {
         this.lastLoadedCampaignId.set(campaignId);
         
         this.applyCampaignSearchFilter();
+        this.loadProductPrices(response);
         
         console.log('Setting loadingProductOffers to false');
         this.loadingProductOffers.set(false);
@@ -222,6 +225,36 @@ export class Products {
         alert('Failed to load product offers. Please try again.');
       }
     });
+  }
+
+  loadProductPrices(offers: ProductOffer[]): void {
+    if (offers.length === 0) return;
+
+    this.loadingPrices.set(true);
+    const uniqueProductIds = [...new Set(offers.map(offer => offer.productId))];
+    
+    // Her product ID için API çağrısı yap
+    const priceRequests = uniqueProductIds.map(productId => 
+      this.catalogService.getProductById(productId)
+    );
+
+    forkJoin(priceRequests).subscribe({
+      next: (products: any[]) => {
+        products.forEach(product => {
+          this.productPrices[product.id] = product;
+        });
+        console.log('Product prices loaded:', this.productPrices);
+        this.loadingPrices.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading product prices:', error);
+        this.loadingPrices.set(false);
+      }
+    });
+  }
+
+  getProductPrice(productId: string): number {
+    return this.productPrices[productId]?.price || 0;
   }
 
   applySearchFilter(): void {
@@ -386,7 +419,11 @@ export class Products {
 
   addToBasket(): void {
     if (this.selectedOffer && !this.basket.find(item => item.id === this.selectedOffer.id)) {
-      this.basket.push({...this.selectedOffer});
+      const price = this.getProductPrice(this.selectedOffer.productId);
+      this.basket.push({
+        ...this.selectedOffer,
+        price: price
+      });
       this.selectedOffer = null;
     }
   }
@@ -412,8 +449,9 @@ export class Products {
         this.productForms[product.id] = this.fb.group(formGroup);
       });
       
-      // İlk adresi default olarak seç
-      this.selectedConfigAddress = this.mockAddresses.find(a => a.isDefault)?.id || '';
+      // İlk primary adresi veya ilk adresi default olarak seç
+      this.selectedConfigAddress = this.customerAddresses.find(a => a.isDefault)?.id || 
+                                    (this.customerAddresses.length > 0 ? this.customerAddresses[0].id : '');
     }
   }
 
@@ -492,7 +530,7 @@ export class Products {
   }
 
   getSelectedAddress(): any {
-    return this.mockAddresses.find(a => a.id === this.selectedConfigAddress);
+    return this.customerAddresses.find(a => a.id === this.selectedConfigAddress);
   }
 
   getTotalAmount(): number {
@@ -503,11 +541,11 @@ export class Products {
   getDisplayedConfigAddresses(): any[] {
     const startIndex = (this.currentConfigAddressPage - 1) * this.configAddressesPerPage;
     const endIndex = startIndex + this.configAddressesPerPage;
-    return this.mockAddresses.slice(startIndex, endIndex);
+    return this.customerAddresses.slice(startIndex, endIndex);
   }
 
   nextConfigAddressPage(): void {
-    const totalPages = Math.ceil(this.mockAddresses.length / this.configAddressesPerPage);
+    const totalPages = Math.ceil(this.customerAddresses.length / this.configAddressesPerPage);
     if (this.currentConfigAddressPage < totalPages) {
       this.currentConfigAddressPage++;
     }
@@ -520,16 +558,16 @@ export class Products {
   }
 
   get totalConfigAddressPages(): number {
-    return Math.ceil(this.mockAddresses.length / this.configAddressesPerPage);
+    return Math.ceil(this.customerAddresses.length / this.configAddressesPerPage);
   }
 
   shouldShowNextConfigArrow(): boolean {
-    return this.mockAddresses.length > this.configAddressesPerPage && 
+    return this.customerAddresses.length > this.configAddressesPerPage && 
            this.currentConfigAddressPage < this.totalConfigAddressPages;
   }
 
   shouldShowPrevConfigArrow(): boolean {
-    return this.mockAddresses.length > this.configAddressesPerPage && 
+    return this.customerAddresses.length > this.configAddressesPerPage && 
            this.currentConfigAddressPage > 1;
   }
 

@@ -667,6 +667,7 @@
                       accountType: account.typeName,
                       status: account.statusName
                     }"
+                    [addresses]="addressList"
                     [isOpen]="openedAccount === account.accountNumber"
                     (toggle)="toggleAccount($event)"
                     (edit)="editAccount($event)"

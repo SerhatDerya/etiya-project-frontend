@@ -19,6 +19,7 @@ export interface Account {
 })
 export class AccountItem {
   @Input() account!: Account;
+  @Input() addresses: any[] = [];
   @Input() isOpen: boolean = false;
 
   @Output() toggle = new EventEmitter<string>();
