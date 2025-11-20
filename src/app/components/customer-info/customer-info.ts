@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, Validator, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CustomerService } from '../../services/customer-service';
 import { CustomerListResponse, AddressSearch, ContactMedium } from '../../models/customerListResponse';
@@ -128,20 +128,20 @@ export class CustomerInfo implements OnInit {
 
   initializeForm(): void {
     this.customerForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(20)]],
+      lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(20)]],
       gender: ['', Validators.required],
-      motherName: [''],
-      middleName: [''],
-      birthDate: ['', Validators.required],
-      fatherName: [''],
+      motherName: ['', [Validators.minLength(2), Validators.maxLength(20)]],
+      middleName: ['', [Validators.minLength(2), Validators.maxLength(20)]],
+      birthDate: ['', [Validators.required, this.ageValidator(16)]],
+      fatherName: ['', [Validators.minLength(2), Validators.maxLength(20)]],
       nationalityId: ['', [Validators.required, Validators.pattern('^\\d{10}[02468]$')]],
 
       account: this.fb.group({}),
       address: this.fb.group({}),
 
       email: ['', [Validators.required, Validators.email]],
-      mobilePhone: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      mobilePhone: ['', [Validators.required, Validators.pattern('^\\+?\\d{10,15}$')]],
       homePhone: [''],
       fax: ['']
     });
@@ -171,6 +171,101 @@ export class CustomerInfo implements OnInit {
       accountName: ['', Validators.required],
       description: ['', Validators.required]
     });
+  }
+
+  getErrorMessage(controlName: string): string {
+    const control = this.customerForm.get(controlName);
+    
+    if (!control || !control.errors) {
+      return '';
+    }
+
+    switch (controlName) {
+      case 'firstName':
+      case 'lastName':
+        if (control.errors['required']) {
+          return `${this.getLabel(controlName)} is required`;
+        }
+        if (control.errors['minlength'] || control.errors['maxlength']) {
+          return `${this.getLabel(controlName)} must be between 2-20 characters`;
+        }
+        break;
+
+      case 'motherName':
+      case 'middleName':
+      case 'fatherName':
+        if (control.errors['minlength'] || control.errors['maxlength']) {
+          return `${this.getLabel(controlName)} must be between 2-20 characters`;
+        }
+        break;
+
+      case 'birthDate':
+        if (control.errors['required']) {
+          return 'Birth Date is required';
+        }
+        if (control.errors['minAgeRequired']) {
+          return 'Customer must be at least 16 years old';
+        }
+        break;
+
+      case 'gender':
+        if (control.errors['required']) {
+          return 'Gender is required';
+        }
+        break;
+
+      case 'nationalityId':
+        if (control.errors['required']) {
+          return 'Nationality ID is required';
+        }
+        if (control.errors['pattern']) {
+          return 'Nationality ID must be an 11-digit even number';
+        }
+        break;
+
+      case 'email':
+        if (control.errors['required']) {
+          return 'E-mail is required';
+        }
+        if (control.errors['email']) {
+          return 'E-mail must be a valid email address';
+        }
+        break;
+
+      case 'mobilePhone':
+        if (control.errors['required']) {
+          return 'Mobile Phone is required';
+        }
+        if (control.errors['pattern']) {
+          return 'Mobile Phone must be a valid phone number';
+        }
+        break;
+
+      default:
+        return `${this.getLabel(controlName)} is invalid`;
+    }
+
+    return '';
+  }
+
+  ageValidator(minAge: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) {
+        return null;
+      }
+
+      const birthDate = new Date(control.value);
+      const today = new Date();
+      
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDifference = today.getMonth() - birthDate.getMonth();
+      
+      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      return age >= minAge ? null : { minAgeRequired: { requiredAge: minAge, actualAge: age } };
+    };
   }
 
   loadCities(): void {
